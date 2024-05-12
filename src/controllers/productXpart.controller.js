@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel} from 
 
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos las partes de un producto
 export const getProductXParts = async(req,res)=> {
         const result = await getAllModels(ProductXPart);
         if (result.success) {
@@ -15,7 +15,7 @@ export const getProductXParts = async(req,res)=> {
         }
 }
 
-//Metodo que trae un rol especifico
+//Metodo que trae la parte especifica de un producto
 //Parametros: id
 export const getProductXPartById = async(req,res)=>{
     const { id } = req.params;
@@ -28,8 +28,8 @@ export const getProductXPartById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
-//Parametros: name, description
+//Metodo que agrega una parte a un producto
+//Parametros: id_product, id_part, id_company
 export const createProductXPart =  async(req,res)=> {
     const { id_product, id_part, id_company } = req.body;
 
@@ -51,8 +51,8 @@ export const createProductXPart =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza una pare de un producto
+//Parametros: id, id_product, id_part, id_company
 export const updateProductXPart = async(req,res)=>{
     const { id } = req.params;
     let { id_product, id_part, id_company } = req.body;
@@ -77,7 +77,7 @@ export const updateProductXPart = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina una parte de un producto
 //Parametros: id
 export const deleteProductXPart = async(req,res)=>{
     const { id } = req.params;

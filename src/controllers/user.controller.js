@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel} from 
 const namePrimaryKey='identification'
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos los usuarios
 export const getUsers = async(req,res)=> {
         const result = await getAllModels(User);
         if (result.success) {
@@ -15,7 +15,7 @@ export const getUsers = async(req,res)=> {
         }
 }
 
-
+//Metodo que devuelve un usuario por su id
 export const getUserById = async(req,res)=>{
     const { identification } = req.params;
     const result = await getModelById(User, identification);
@@ -27,8 +27,8 @@ export const getUserById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
-//Parametros: name, description
+//Metodo que crea un nuevo usuario
+//Parametros: identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_company
 export const createUser =  async(req,res)=> {
     const { identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_company } = req.body;
 
@@ -49,8 +49,8 @@ export const createUser =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza un usuario
+//Parametros: identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_company
 export const updateUser = async (req, res) => {
     const { identification } = req.params;
     let { name, lastname, username, password, status, photo, email, phone, id_rol, id_company } = req.body;
@@ -86,8 +86,8 @@ export const updateUser = async (req, res) => {
 };
 
 
-//Metodo que elimina una compañia
-//Parametros: id
+//Metodo que elimina una usuario
+//Parametros: identification
 export const deleteUser = async(req,res)=>{
     const { identification } = req.params;
     const result = await deleteModel(User, identification, namePrimaryKey);

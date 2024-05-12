@@ -21,6 +21,10 @@ import productoXPartRoute from './routes/productxpart.route.js';
 import productoXSupplierRoute from './routes/productxsupplier.js';
 import supplierXPartRoutes from './routes/supplierxpart.route.js';
 import clientRoutes from './routes/client.route.js';
+import billRoutes from './routes/bill.route.js';
+import saleRoutes from './routes/sale.route.js';
+
+
 
 
 
@@ -81,6 +85,9 @@ app.use('/api/v1', productoXPartRoute);
 app.use('/api/v1', productoXSupplierRoute);
 app.use('/api/v1', supplierXPartRoutes);
 app.use('/api/v1', clientRoutes);
+app.use('/api/v1', billRoutes);
+app.use('/api/v1', saleRoutes);
+
 
 
 

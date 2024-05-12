@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel} from 
 
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos los productos
 export const getProducts = async(req,res)=> {
         const result = await getAllModels(Product);
         if (result.success) {
@@ -15,7 +15,7 @@ export const getProducts = async(req,res)=> {
         }
 }
 
-//Metodo que trae un rol especifico
+//Metodo que trae un producto especifico
 //Parametros: id
 export const getProductById = async(req,res)=>{
     const { id } = req.params;
@@ -28,8 +28,8 @@ export const getProductById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
-//Parametros: name, description
+//Metodo que crea un nuevo producto
+//Parametros:  name, price, quantity, description, photo, status,discount, id_category, id_company
 export const createProduct =  async(req,res)=> {
     const { name, price, quantity, description, photo, status,discount, id_category, id_company } = req.body;
     if(!name || !price || !quantity || !description || !photo || !discount || !id_category || !id_company) return res.status(400).json({message:"Fill all fields"})
@@ -51,8 +51,8 @@ export const createProduct =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza un producto
+//Parametros: id, name, price, quantity, description, photo, status,discount, id_category, id_company
 export const updateProduct = async(req,res)=>{
     const { id } = req.params;
     let { name, price, quantity, description, photo, status,discount, id_category, id_company } = req.body;
@@ -82,7 +82,7 @@ export const updateProduct = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina una producto
 //Parametros: id
 export const deleteProduct = async(req,res)=>{
     const { id } = req.params;

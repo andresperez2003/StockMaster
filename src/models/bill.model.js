@@ -16,11 +16,11 @@ const Bill = sequelize.define('Bill', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  user_id:{
+  id_user:{
     type: DataTypes.STRING,
     allowNull: false
   },
-  client_id:{
+  id_client:{
     type: DataTypes.STRING,
     allowNull: false
   },

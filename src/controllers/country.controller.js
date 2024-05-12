@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel, getMo
 
 
 
-//Metodo que devuelve todos las compañias
+//Metodo que devuelve todos los paises
 export const getCountries = async(req,res)=> {
         const result = await getAllModels(Country);
         if (result.success) {
@@ -15,8 +15,8 @@ export const getCountries = async(req,res)=> {
         }
 }
 
-//Metodo que trae una compañia especifica
-//Parametros: nit
+//Metodo que trae un pais especifico
+//Parametros: id
 export const getCountryById = async(req,res)=>{
     const { id } = req.params;
     const result = await getModelById(Country, id);
@@ -28,10 +28,10 @@ export const getCountryById = async(req,res)=>{
 }
 
 
-//Metodo que crea una nueva compañia
-//Parametros: nit, name, id_masteruser
+//Metodo que crea un nuevo pais
+//Parametros:  name
 export const createCountry =  async(req,res)=> {
-    const { nit, name, id_masteruser } = req.body;
+    const {name } = req.body;
     const result = await createModel(Country, { name });
     if (result.success) {
         res.status(result.status).json({ message: 'Country created' });
@@ -42,8 +42,8 @@ export const createCountry =  async(req,res)=> {
 
 
  
-//Metodo que actualiza una compañia
-//Parametros: name, id_masteruser, nit
+//Metodo que actualiza un pais
+//Parametros: id, name
 export const updateCountry = async(req,res)=>{
         const { id } = req.params;
     const { name } = req.body;
@@ -57,7 +57,7 @@ export const updateCountry = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina un pais
 //Parametros: id
 export const deleteCountry = async(req,res)=>{
     const { id } = req.params;
@@ -70,8 +70,8 @@ export const deleteCountry = async(req,res)=>{
 }
 
 
-//Metodo que trae una compañia especifica
-//Parametros: nit
+//Metodo que trae un pais por su nombre
+//Parametros: name
 export const getCountryByName = async(req,res)=>{
     const { name } = req.params;
     const nameLower = name.toLowerCase();

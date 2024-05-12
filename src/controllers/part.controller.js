@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel} from 
 
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos las partes
 export const getParts = async(req,res)=> {
         const result = await getAllModels(Part);
         if (result.success) {
@@ -15,7 +15,7 @@ export const getParts = async(req,res)=> {
         }
 }
 
-//Metodo que trae un rol especifico
+//Metodo que trae una parte especifica
 //Parametros: id
 export const getPartById = async(req,res)=>{
     const { id } = req.params;
@@ -28,8 +28,8 @@ export const getPartById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
-//Parametros: name, description
+//Metodo que crea una nueva parte
+//Parametros: name, quantity, price, unit, photo, id_company 
 export const createPart =  async(req,res)=> {
     const { name, quantity, price, unit, photo, id_company } = req.body;
 
@@ -51,8 +51,8 @@ export const createPart =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza una parte
+//Parametros: id, name, quantity, price, unit, photo, id_company 
 export const updatePart = async(req,res)=>{
     const { id } = req.params;
     let { name, quantity, price,unit, photo } = req.body;
@@ -79,7 +79,7 @@ export const updatePart = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina una parte
 //Parametros: id
 export const deletePart = async(req,res)=>{
     const { id } = req.params;

@@ -14,8 +14,8 @@ export const getCities = async(req,res)=> {
         }
 }
 
-//Metodo que trae una compañia especifica
-//Parametros: nit
+//Metodo que trae una ciudad especifica
+//Parametros: id
 export const getCityById = async(req,res)=>{
     const { id } = req.params;
     const result = await getModelById(City, id);

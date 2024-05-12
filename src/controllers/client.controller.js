@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel} from 
 const namePrimaryKey = "identification"
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos los clientes
 export const getClients = async(req,res)=> {
         const result = await getAllModels(Client);
         if (result.success) {
@@ -15,7 +15,7 @@ export const getClients = async(req,res)=> {
         }
 }
 
-
+//Metodo que trae solo un cliente
 export const getClientById = async(req,res)=>{
     const { identification } = req.params;
     const result = await getModelById(Client, identification);
@@ -27,8 +27,8 @@ export const getClientById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
-//Parametros: name, description
+//Metodo que crea un nuevo cliente
+//Parametros: identification, name, lastname, email, status, phone, id_city, id_company, address
 export const createClient =  async(req,res)=> {
     const { identification, name, lastname, email, status, phone, id_city, id_company, address } = req.body;
 
@@ -49,8 +49,8 @@ export const createClient =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza un nuevo cliente
+//Parametros: identification, name, lastname, email, status, phone, id_city, id_company, address
 export const updateClient = async (req, res) => {
     const { identification } = req.params;
     let { name, lastname, email, status, id_city, phone, id_company, address } = req.body;
@@ -82,8 +82,8 @@ export const updateClient = async (req, res) => {
 };
 
 
-//Metodo que elimina una compañia
-//Parametros: id
+//Metodo que elimina un cliente
+//Parametros: identification
 export const deleteClient = async(req,res)=>{
     const { identification } = req.params;
     const result = await deleteModel(Client, identification, namePrimaryKey);

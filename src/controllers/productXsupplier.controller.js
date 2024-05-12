@@ -4,7 +4,7 @@ import { ProductXSupplier } from '../models/productXsupplier.model.js';
 import {getAllModels, getModelById, createModel, updateModel, deleteModel} from "./general.controller.js"
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos los proveedores de los producto
 export const getProductXSupplier = async(req,res)=> {
         const result = await getAllModels(ProductXSupplier);
         if (result.success) {
@@ -14,7 +14,7 @@ export const getProductXSupplier = async(req,res)=> {
         }
 }
 
-//Metodo que trae un rol especifico
+//Metodo que trae los proveedores de un producto
 //Parametros: id
 export const getProductXSupplierById = async(req,res)=>{
     const { id } = req.params;
@@ -27,7 +27,7 @@ export const getProductXSupplierById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
+//Metodo que agrega un proveedor a un producto
 //Parametros: name, description
 export const createProductXSupplier =  async(req,res)=> {
     const { id_product, id_supplier, id_company } = req.body;
@@ -50,8 +50,8 @@ export const createProductXSupplier =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza el proveedor de un producto
+//Parametros: id,id_product, id_supplier, id_company
 export const updateProductXSupplier = async(req,res)=>{
     const { id } = req.params;
     let { id_product, id_supplier, id_company } = req.body;
@@ -76,7 +76,7 @@ export const updateProductXSupplier = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina el proveedor de un producto
 //Parametros: id
 export const deleteProductXSupplier = async(req,res)=>{
     const { id } = req.params;

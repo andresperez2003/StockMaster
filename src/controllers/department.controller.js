@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel, getMo
 
 
 
-//Metodo que devuelve todos las compañias
+//Metodo que devuelve todos los departamentos
 export const getDepartment = async(req,res)=> {
         const result = await getAllModels(Department);
         if (result.success) {
@@ -15,8 +15,8 @@ export const getDepartment = async(req,res)=> {
         }
 }
 
-//Metodo que trae una compañia especifica
-//Parametros: nit
+//Metodo que trae un departamento especifico
+//Parametros: id
 export const getDepartmentById = async(req,res)=>{
     const { id } = req.params;
     const result = await getModelById(Department, id);
@@ -28,8 +28,8 @@ export const getDepartmentById = async(req,res)=>{
 }
 
 
-//Metodo que crea una nueva compañia
-//Parametros: nit, name, id_masteruser
+//Metodo que crea un nuevo departamento
+//Parametros: name, id_country
 export const createDepartment =  async(req,res)=> {
     const { name, id_country } = req.body;
     const result = await createModel(Department, { name, id_country });
@@ -42,8 +42,8 @@ export const createDepartment =  async(req,res)=> {
 
 
  
-//Metodo que actualiza una compañia
-//Parametros: name, id_masteruser, nit
+//Metodo que actualiza un pais
+//Parametros: id, name, id_country
 export const updateDepartment = async(req,res)=>{
         const { id } = req.params;
     const { name, id_country } = req.body;
@@ -57,7 +57,7 @@ export const updateDepartment = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina un pais
 //Parametros: id
 export const deleteDepartment = async(req,res)=>{
     const { id } = req.params;
@@ -70,8 +70,8 @@ export const deleteDepartment = async(req,res)=>{
 }
 
 
-//Metodo que trae una compañia especifica
-//Parametros: nit
+//Metodo que trae un pais por su nombre
+//Parametros: name
 export const getDepartmentByName = async(req,res)=>{
     const { name } = req.params;
     const nameLower = name.toLowerCase();
@@ -84,8 +84,8 @@ export const getDepartmentByName = async(req,res)=>{
     }
 }
 
-//Metodo que trae una compañia especifica
-//Parametros: nit
+//Metodo que trae los departamentos por pais
+//Parametros: id_country
 export const getDepartmentByCountry = async(req,res)=>{
     const { country } = req.params;
     console.log("country ");

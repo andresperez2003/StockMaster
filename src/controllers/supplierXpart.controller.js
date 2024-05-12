@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel} from 
 
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos los proveedores de cada parte
 export const getSupplierXPart = async(req,res)=> {
         const result = await getAllModels(SupplierXPart);
         if (result.success) {
@@ -15,7 +15,7 @@ export const getSupplierXPart = async(req,res)=> {
         }
 }
 
-//Metodo que trae un rol especifico
+//Metodo que trae un proveedor de una parte
 //Parametros: id
 export const getSupplierXPartById = async(req,res)=>{
     const { id } = req.params;
@@ -28,8 +28,8 @@ export const getSupplierXPartById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
-//Parametros: name, description
+//Metodo que agrega un proveedor a una parte
+//Parametros: id_supplier, id_part, id_company
 export const createSupplierXPart =  async(req,res)=> {
     const { id_supplier, id_part, id_company } = req.body;
 
@@ -51,8 +51,8 @@ export const createSupplierXPart =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza el proveedor de una parte
+//Parametros: id, id_supplier, id_part, id_company
 export const updateSupplierXPart = async(req,res)=>{
     const { id } = req.params;
     let { id_part, id_supplier, id_company } = req.body;
@@ -77,7 +77,7 @@ export const updateSupplierXPart = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina el proveedor de una parte
 //Parametros: id
 export const deleteSupplierXPart = async(req,res)=>{
     const { id } = req.params;

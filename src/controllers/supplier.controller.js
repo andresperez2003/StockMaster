@@ -5,7 +5,7 @@ import {getAllModels, getModelById, createModel, updateModel, deleteModel} from 
 
 
 
-//Metodo que devuelve todos los roles
+//Metodo que devuelve todos los proveedores
 export const getSuppliers = async(req,res)=> {
         const result = await getAllModels(Supplier);
         if (result.success) {
@@ -15,7 +15,7 @@ export const getSuppliers = async(req,res)=> {
         }
 }
 
-//Metodo que trae un rol especifico
+//Metodo que trae un proveedor especifico
 //Parametros: id
 export const getSupplierById = async(req,res)=>{
     const { id } = req.params;
@@ -28,8 +28,8 @@ export const getSupplierById = async(req,res)=>{
 }
 
 
-//Metodo que crea un nuevo rol
-//Parametros: name, description
+//Metodo que crea un nuevo proveedor
+//Parametros: name, phone, name_seller, photo, id_compan
 export const createSupplier =  async(req,res)=> {
     const { name, phone, name_seller, photo, id_company } = req.body;
 
@@ -51,8 +51,8 @@ export const createSupplier =  async(req,res)=> {
 
 
  
-//Metodo que actualiza un rol
-//Parametros: name, description
+//Metodo que actualiza un proveedor
+//Parametros: id, name, phone, name_seller, photo, id_compan
 export const updateSupplier = async(req,res)=>{
     const { id } = req.params;
     let { name, phone, name_seller, photo, id_company } = req.body;
@@ -80,7 +80,7 @@ export const updateSupplier = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
+//Metodo que elimina una proveedor
 //Parametros: id
 export const deleteSupplier = async(req,res)=>{
     const { id } = req.params;
