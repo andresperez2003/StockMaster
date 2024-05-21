@@ -4,10 +4,6 @@ import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la in
 
 // Define el modelo de la tabla Bill
 const Bill = sequelize.define('Bill', {
-  id:{
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   date_bill: {
     type: DataTypes.DATE,
     allowNull: false

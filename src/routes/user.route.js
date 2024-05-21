@@ -1,6 +1,6 @@
 import {Router} from 'express'
-import {getUsers, getUserById, createUser, updateUser, deleteUser} from '../controllers/user.controller.js'
-
+import {getUsers, getUserById, createUser, updateUser, deleteUser, getUserByUsername, UserLogin} from '../controllers/user.controller.js'
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Users    
  */
-router.get('/users', getUsers)
+router.get('/users', validateToken,  getUsers)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/users', getUsers)
  *       404:
  *         description: Usuario no encontrado
  */
-router.get('/users/:identification', getUserById)
+router.get('/users/:identification', validateToken,  getUserById)
 
 
 /**
@@ -151,7 +151,7 @@ router.post('/users',  createUser)
  *         description: Usuario creado
 
  */
-router.put('/users/:identification',  updateUser)
+router.put('/users/:identification',  validateToken,   updateUser)
 
 
 
@@ -176,5 +176,34 @@ router.put('/users/:identification',  updateUser)
  *         description: Usuario no encontrado
  */
 router.delete('/users/:identification',  deleteUser)
+
+
+/**
+ * @swagger
+ * /api/v1/users/login:
+ *   post:
+ *     summary: Trae un usuario del sistema
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Nombre de usuario del sistema
+ *               password:
+ *                 type: string
+ *                 description: Contraseña del usuario del sistema
+ *     tags:
+ *       - Users
+ *     responses:
+ *       201:
+ *         description: Usuario encontrado
+
+ */
+router.post('/users/login', UserLogin)
+
 
 export default router

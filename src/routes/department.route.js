@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getDepartment,getDepartmentById,getDepartmentByName,updateDepartment,createDepartment, deleteDepartment, getDepartmentByCountry} from '../controllers/department.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Departments    
  */
-router.get('/departments', getDepartment)
+router.get('/departments', validateToken,  getDepartment)
 
 /**
  * @swagger
@@ -38,7 +38,7 @@ router.get('/departments', getDepartment)
  *       404:
  *         description: Departamento no encontrado
  */
-router.get('/departments/:name', getDepartmentByName)
+router.get('/departments/:name', validateToken,  getDepartmentByName)
 
 
 /**
@@ -61,7 +61,7 @@ router.get('/departments/:name', getDepartmentByName)
  *       404:
  *         description: Departamento no encontrado
  */
-router.get('/departments/country/:country', getDepartmentByCountry)
+router.get('/departments/country/:country', validateToken,  getDepartmentByCountry)
 
 
 /**
@@ -84,7 +84,7 @@ router.get('/departments/country/:country', getDepartmentByCountry)
  *       404:
  *         description: Departamento no encontrado
  */
-router.get('/departments/:id', getDepartmentById)
+router.get('/departments/:id', validateToken,  getDepartmentById)
 
 
 
@@ -110,7 +110,7 @@ router.get('/departments/:id', getDepartmentById)
  *         description: Departamento creado
 
  */
-router.post('/departments',  createDepartment)
+router.post('/departments',  validateToken,  createDepartment)
 
 
 /**
@@ -143,7 +143,7 @@ router.post('/departments',  createDepartment)
  *       404:
  *         description: Departamento no encontrado
  */
-router.put('/departments/:id',  updateDepartment)
+router.put('/departments/:id',  validateToken,  updateDepartment)
 
 
 /**
@@ -166,7 +166,7 @@ router.put('/departments/:id',  updateDepartment)
  *       404:
  *         description: Departamento no encontrado
  */
-router.delete('/departments/:id',  deleteDepartment)
+router.delete('/departments/:id', validateToken,   deleteDepartment)
 
 
 

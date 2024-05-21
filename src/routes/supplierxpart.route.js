@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getSupplierXPart, getSupplierXPartById, createSupplierXPart, updateSupplierXPart, deleteSupplierXPart} from '../controllers/supplierXpart.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - SupplierXPart    
  */
-router.get('/supplierXparts', getSupplierXPart)
+router.get('/supplierXparts', validateToken,  getSupplierXPart)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/supplierXparts', getSupplierXPart)
  *       404:
  *         description: Proveedores de la parte no encontrado
  */
-router.get('/supplierXparts/:id', getSupplierXPartById)
+router.get('/supplierXparts/:id', validateToken,  getSupplierXPartById)
 
 
 
@@ -71,7 +71,7 @@ router.get('/supplierXparts/:id', getSupplierXPartById)
  *         description: Parte agregar al producto
 
  */
-router.post('/supplierXparts',  createSupplierXPart)
+router.post('/supplierXparts',  validateToken,  createSupplierXPart)
 
 
 /**
@@ -110,7 +110,7 @@ router.post('/supplierXparts',  createSupplierXPart)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.put('/supplierXparts/:id',  updateSupplierXPart)
+router.put('/supplierXparts/:id',  validateToken,  updateSupplierXPart)
 
 
 /**
@@ -133,7 +133,7 @@ router.put('/supplierXparts/:id',  updateSupplierXPart)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.delete('/supplierXparts/:id',  deleteSupplierXPart)
+router.delete('/supplierXparts/:id', validateToken,   deleteSupplierXPart)
 
 
 

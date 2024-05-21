@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getCities, getCityById, getCityByName, getCityByDepartment, createCity, updateCity, deleteCity} from '../controllers/city.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Cities    
  */
-router.get('/cities', getCities)
+router.get('/cities', validateToken,  getCities)
 
 /**
  * @swagger
@@ -38,7 +38,7 @@ router.get('/cities', getCities)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.get('/cities/:name', getCityByName)
+router.get('/cities/:name', validateToken,  getCityByName)
 
 
 /**
@@ -61,7 +61,7 @@ router.get('/cities/:name', getCityByName)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.get('/cities/department/:department', getCityByDepartment)
+router.get('/cities/department/:department', validateToken,  getCityByDepartment)
 
 
 /**
@@ -84,7 +84,7 @@ router.get('/cities/department/:department', getCityByDepartment)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.get('/cities/:id', getCityById)
+router.get('/cities/:id', validateToken,  getCityById)
 
 
 
@@ -113,7 +113,7 @@ router.get('/cities/:id', getCityById)
  *         description: Ciudad creada
 
  */
-router.post('/cities',  createCity)
+router.post('/cities', validateToken,   createCity)
 
 
 /**
@@ -146,7 +146,7 @@ router.post('/cities',  createCity)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.put('/cities/:id',  updateCity)
+router.put('/cities/:id', validateToken,   updateCity)
 
 
 /**
@@ -169,7 +169,7 @@ router.put('/cities/:id',  updateCity)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.delete('/cities/:id',  deleteCity)
+router.delete('/cities/:id',  validateToken,  deleteCity)
 
 
 

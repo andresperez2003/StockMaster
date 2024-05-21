@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getRoles,getRolById, createRol, updateRol, deleteRol} from '../controllers/rol.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Rols    
  */
-router.get('/rols', getRoles)
+router.get('/rols', validateToken,  getRoles)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/rols', getRoles)
  *       404:
  *         description: Rol no encontrado
  */
-router.get('/rols/:id', getRolById)
+router.get('/rols/:id', validateToken,  getRolById)
 
 
 
@@ -71,7 +71,7 @@ router.get('/rols/:id', getRolById)
  *         description: Rol creado
 
  */
-router.post('/rols',  createRol)
+router.post('/rols', validateToken,   createRol)
 
 
 /**
@@ -110,7 +110,7 @@ router.post('/rols',  createRol)
  *       404:
  *         description: Rol no encontrado
  */
-router.put('/rols/:id',  updateRol)
+router.put('/rols/:id', validateToken,   updateRol)
 
 
 /**
@@ -133,7 +133,7 @@ router.put('/rols/:id',  updateRol)
  *       404:
  *         description: Rol no encontrado
  */
-router.delete('/rols/:id',  deleteRol)
+router.delete('/rols/:id', validateToken,   deleteRol)
 
 
 

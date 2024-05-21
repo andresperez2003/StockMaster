@@ -1,6 +1,10 @@
 
 import { User } from '../models/user.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne} from "./general.controller.js"
+import jwt from 'jsonwebtoken'
+import {config} from 'dotenv'
+
+config()
 
 const namePrimaryKey='identification'
 
@@ -96,4 +100,36 @@ export const deleteUser = async(req,res)=>{
     } else {
         res.status(result.status).json({ message: result.message, error: result?.error });
     }
+}
+
+export const getUserByUsername = async(username,req,res)=>{
+    return await getModelByParameterOne(User, "username", username)
+}
+
+export const UserLogin = async(req,res)=>{
+    const { password, username } = req.body;
+    const user = await getUserByUsername(username)
+    const passwordUser = user.model.dataValues.password
+    if(passwordUser == password){
+        const accessToken = generateAccessToken(user);
+        return res.status(200).json({ message: 'Logged', token:accessToken });
+    }
+    return res.status(401).json({ message: "Not authorized" });
+}
+
+function generateAccessToken(user){
+    return jwt.sign(user, process.env.SECRET, {expiresIn: '30m'})
+}
+
+function validateToken(req,res,next){
+    const accessToken = req.headers['authorization']
+    if(!accessToken) res.status(401).json({message:"Access denied"})
+
+    jwt.verify(accessToken, process.env.SECRET, (err, user)=>{
+        if(err){
+            res.status(401).json({message:"Access denied, token not valid"})
+        }else{
+            next();
+        }
+    })
 }

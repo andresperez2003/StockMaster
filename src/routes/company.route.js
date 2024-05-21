@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getCompanies, getCompanyById, createCompany, updateCompany, deleteCompany, getCompanyOnlyActive, getCompanyOnlyInactive} from '../controllers/company.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -29,7 +29,7 @@ router.get('/companies', getCompanies)
  *     tags:
  *       - Companies    
  */
-router.get('/companies/active', getCompanyOnlyActive)
+router.get('/companies/active', validateToken,  getCompanyOnlyActive)
 
 /**
  * @swagger
@@ -42,7 +42,7 @@ router.get('/companies/active', getCompanyOnlyActive)
  *     tags:
  *       - Companies    
  */
-router.get('/companies/inactive', getCompanyOnlyInactive)
+router.get('/companies/inactive', validateToken,  getCompanyOnlyInactive)
 
 
 /**
@@ -65,7 +65,7 @@ router.get('/companies/inactive', getCompanyOnlyInactive)
  *       404:
  *         description: Compañia no encontrada
  */
-router.get('/companies/:id', getCompanyById)
+router.get('/companies/:id', validateToken,  getCompanyById)
 
 
 /**
@@ -107,7 +107,7 @@ router.get('/companies/:id', getCompanyById)
  *       201:
  *         description: Compañia creada
  */
-router.post('/companies',  createCompany)
+router.post('/companies', validateToken,   createCompany)
 
 
 /**
@@ -143,7 +143,7 @@ router.post('/companies',  createCompany)
  *       404:
  *         description: Compañia no encontrad
  */
-router.put('/companies/:id',  updateCompany)
+router.put('/companies/:id', validateToken,   updateCompany)
 
 
 /**
@@ -166,7 +166,7 @@ router.put('/companies/:id',  updateCompany)
  *       404:
  *         description: Compania no encontrada
  */
-router.delete('/companies/:id',  deleteCompany)
+router.delete('/companies/:id', validateToken,   deleteCompany)
 
 
 

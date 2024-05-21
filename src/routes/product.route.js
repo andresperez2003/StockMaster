@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getProducts, getProductById, createProduct, updateProduct, deleteProduct} from '../controllers/product.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Products    
  */
-router.get('/products', getProducts)
+router.get('/products', validateToken,  getProducts)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/products', getProducts)
  *       404:
  *         description: Producto no encontrado
  */
-router.get('/products/:id', getProductById)
+router.get('/products/:id', validateToken,  getProductById)
 
 
 /**
@@ -90,7 +90,7 @@ router.get('/products/:id', getProductById)
  *         description: Usuario editado
 
  */
-router.post('/products',  createProduct)
+router.post('/products', validateToken,   createProduct)
 
 
 
@@ -147,7 +147,7 @@ router.post('/products',  createProduct)
  *         description: Producto creado
 
  */
-router.put('/products/:id', updateProduct)
+router.put('/products/:id', validateToken,  updateProduct)
 
 
 
@@ -171,6 +171,6 @@ router.put('/products/:id', updateProduct)
  *       404:
  *         description: Producto no encontrado
  */
-router.delete('/products/:id',  deleteProduct)
+router.delete('/products/:id', validateToken,   deleteProduct)
 
 export default router

@@ -1,22 +1,33 @@
 import {Router} from 'express'
 import {getBills, getBillsById, createBill, updateBill, deleteBill} from '../controllers/bill.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
+// Definición de seguridad para Swagger
+/**
+ * @swagger
+ * securityDefinitions:
+ *   BearerAuth:
+ *     type: apiKey
+ *     name: Authorization
+ *     in: header
+ */
 
 /**
  * @swagger
  * /api/v1/bills:
  *   get:
  *     summary: Retorna la lista de facturas
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de facturas
  *     tags:
  *       - Bills    
  */
-router.get('/bills', getBills)
+router.get('/bills', validateToken, getBills)
 
 
 /**
@@ -39,7 +50,7 @@ router.get('/bills', getBills)
  *       404:
  *         description: Factura no encontrada
  */
-router.get('/bills/:id', getBillsById)
+router.get('/bills/:id', validateToken, getBillsById)
 
 
 /**
@@ -82,7 +93,7 @@ router.get('/bills/:id', getBillsById)
  *         description: Factura creada
 
  */
-router.post('/bills', createBill)
+router.post('/bills', validateToken,  createBill)
 
 
 /**
@@ -133,7 +144,7 @@ router.post('/bills', createBill)
  *       404:
  *         description: Factura no encontrada
  */
-router.put('/bills/:id',  updateBill)
+router.put('/bills/:id', validateToken,  updateBill)
 
 
 /**
@@ -156,7 +167,7 @@ router.put('/bills/:id',  updateBill)
  *       404:
  *         description: Factura no encontrada
  */
-router.delete('/bills/:id',  deleteBill)
+router.delete('/bills/:id', validateToken,  deleteBill)
 
 
 

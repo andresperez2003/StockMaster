@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getClients, getClientById, createClient, updateClient, deleteClient} from '../controllers/client.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Clients    
  */
-router.get('/clients', getClients)
+router.get('/clients',  validateToken, getClients)
 
 
 /**
@@ -88,7 +88,7 @@ router.get('/clients/:identification', getClientById)
  *         description: Usuario editado
 
  */
-router.post('/clients',  createClient)
+router.post('/clients', validateToken,   createClient)
 
 
 
@@ -142,7 +142,7 @@ router.post('/clients',  createClient)
  *         description: Cliente actualizado
 
  */
-router.put('/clients/:identification',  updateClient)
+router.put('/clients/:identification',  validateToken,  updateClient)
 
 
 
@@ -166,6 +166,6 @@ router.put('/clients/:identification',  updateClient)
  *       404:
  *         description: Cliente no encontrado
  */
-router.delete('/clients/:identification',  deleteClient)
+router.delete('/clients/:identification', validateToken,   deleteClient)
 
 export default router

@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getParts, getPartById, createPart, updatePart, deletePart} from '../controllers/part.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Parts    
  */
-router.get('/parts', getParts)
+router.get('/parts', validateToken,  getParts)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/parts', getParts)
  *       404:
  *         description: Parte no encontrado
  */
-router.get('/parts/:id', getPartById)
+router.get('/parts/:id', validateToken,  getPartById)
 
 
 
@@ -81,7 +81,7 @@ router.get('/parts/:id', getPartById)
  *         description: Parte creado
 
  */
-router.post('/parts',  createPart)
+router.post('/parts', validateToken,   createPart)
 
 
 /**
@@ -124,7 +124,7 @@ router.post('/parts',  createPart)
  *       404:
  *         description: Parte no encontrada
  */
-router.put('/parts/:id',  updatePart)
+router.put('/parts/:id', validateToken,   updatePart)
 
 
 /**
@@ -147,7 +147,7 @@ router.put('/parts/:id',  updatePart)
  *       404:
  *         description: Parte no encontrada
  */
-router.delete('/parts/:id',  deletePart)
+router.delete('/parts/:id', validateToken,   deletePart)
 
 
 

@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getCountries,getCountryById,deleteCountry,createCountry,updateCountry, getCountryByName} from '../controllers/country.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Countries    
  */
-router.get('/countries', getCountries)
+router.get('/countries', validateToken,  getCountries)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/countries', getCountries)
  *       404:
  *         description: Pais no encontrado
  */
-router.get('/countries/:id', getCountryById)
+router.get('/countries/:id', validateToken,  getCountryById)
 
 
 /**
@@ -62,7 +62,7 @@ router.get('/countries/:id', getCountryById)
  *       404:
  *         description: Pais no encontrado
  */
-router.get('/countries/:name', getCountryByName)
+router.get('/countries/:name', validateToken,  getCountryByName)
 
 
 
@@ -88,7 +88,7 @@ router.get('/countries/:name', getCountryByName)
  *         description: Pais creado
 
  */
-router.post('/countries',  createCountry)
+router.post('/countries', validateToken,   createCountry)
 
 
 /**
@@ -121,7 +121,7 @@ router.post('/countries',  createCountry)
  *       404:
  *         description: Pais no encontrado
  */
-router.put('/countries/:id',  updateCountry)
+router.put('/countries/:id', validateToken,   updateCountry)
 
 
 /**
@@ -144,7 +144,7 @@ router.put('/countries/:id',  updateCountry)
  *       404:
  *         description: Pais no encontrado
  */
-router.delete('/countries/:id',  deleteCountry)
+router.delete('/countries/:id', validateToken,   deleteCountry)
 
 
 

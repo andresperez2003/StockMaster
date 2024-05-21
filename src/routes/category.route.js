@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getCategories,getCategoryById,createCategory,deleteCategory,updateCategory} from '../controllers/category.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Categories    
  */
-router.get('/categories', getCategories)
+router.get('/categories', validateToken,  getCategories)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/categories', getCategories)
  *       404:
  *         description: Categoria no encontrada
  */
-router.get('/categories/:id', getCategoryById)
+router.get('/categories/:id', validateToken,  getCategoryById)
 
 
 /**
@@ -70,7 +70,7 @@ router.get('/categories/:id', getCategoryById)
  *         description: Categoria creada
 
  */
-router.post('/categories', createCategory)
+router.post('/categories', validateToken,  createCategory)
 
 
 /**
@@ -106,7 +106,7 @@ router.post('/categories', createCategory)
  *       404:
  *         description: Categoria no encontrada
  */
-router.put('/categories/:id',  updateCategory)
+router.put('/categories/:id', validateToken,   updateCategory)
 
 
 /**
@@ -129,7 +129,7 @@ router.put('/categories/:id',  updateCategory)
  *       404:
  *         description: Categoria no encontrada
  */
-router.delete('/categories/:id',  deleteCategory)
+router.delete('/categories/:id', validateToken,   deleteCategory)
 
 
 

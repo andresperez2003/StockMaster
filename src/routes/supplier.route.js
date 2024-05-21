@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getSuppliers, getSupplierById, createSupplier, updateSupplier, deleteSupplier} from '../controllers/supplier.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Suppliers    
  */
-router.get('/suppliers', getSuppliers)
+router.get('/suppliers',  validateToken, getSuppliers)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/suppliers', getSuppliers)
  *       404:
  *         description: Proveedor no encontrado
  */
-router.get('/suppliers/:id', getSupplierById)
+router.get('/suppliers/:id', validateToken,  getSupplierById)
 
 
 
@@ -77,7 +77,7 @@ router.get('/suppliers/:id', getSupplierById)
  *         description: Proveedor creado
 
  */
-router.post('/suppliers',  createSupplier)
+router.post('/suppliers', validateToken,   createSupplier)
 
 
 /**
@@ -122,7 +122,7 @@ router.post('/suppliers',  createSupplier)
  *       404:
  *         description: Proveedor no encontrado
  */
-router.put('/suppliers/:id',  updateSupplier)
+router.put('/suppliers/:id', validateToken,   updateSupplier)
 
 
 /**
@@ -145,7 +145,7 @@ router.put('/suppliers/:id',  updateSupplier)
  *       404:
  *         description: Proveedor no encontrado
  */
-router.delete('/suppliers/:id',  deleteSupplier)
+router.delete('/suppliers/:id',  validateToken,  deleteSupplier)
 
 
 

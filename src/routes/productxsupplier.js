@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getProductXSupplier, getProductXSupplierById, updateProductXSupplier, createProductXSupplier, deleteProductXSupplier} from '../controllers/productXsupplier.controller.js'
-
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - ProductXSupplier   
  */
-router.get('/productXsupplier', getProductXSupplier)
+router.get('/productXsupplier', validateToken,  getProductXSupplier)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/productXsupplier', getProductXSupplier)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.get('/productXsupplier/:id', getProductXSupplierById)
+router.get('/productXsupplier/:id', validateToken,  getProductXSupplierById)
 
 
 
@@ -71,7 +71,7 @@ router.get('/productXsupplier/:id', getProductXSupplierById)
  *         description: Proveedor agregado al producto
 
  */
-router.post('/productXsupplier',  createProductXSupplier)
+router.post('/productXsupplier', validateToken,   createProductXSupplier)
 
 
 /**
@@ -110,7 +110,7 @@ router.post('/productXsupplier',  createProductXSupplier)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.put('/productXsupplier/:id',  updateProductXSupplier)
+router.put('/productXsupplier/:id',  validateToken,  updateProductXSupplier)
 
 
 /**
@@ -133,7 +133,7 @@ router.put('/productXsupplier/:id',  updateProductXSupplier)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.delete('/productXsupplier/:id',  deleteProductXSupplier)
+router.delete('/productXsupplier/:id',  validateToken,  deleteProductXSupplier)
 
 
 
