@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Clients    
  */
-router.get('/clients',  validateToken, getClients)
+router.get('/clients/:company', getClients)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/clients',  validateToken, getClients)
  *       404:
  *         description: Cliente no encontrado
  */
-router.get('/clients/:identification', getClientById)
+router.get('/clients/:company/:identification', getClientById)
 
 
 /**
@@ -88,7 +88,7 @@ router.get('/clients/:identification', getClientById)
  *         description: Usuario editado
 
  */
-router.post('/clients', validateToken,   createClient)
+router.post('/clients',   createClient)
 
 
 
@@ -142,7 +142,7 @@ router.post('/clients', validateToken,   createClient)
  *         description: Cliente actualizado
 
  */
-router.put('/clients/:identification',  validateToken,  updateClient)
+router.put('/clients/:identification',  updateClient)
 
 
 
@@ -166,6 +166,6 @@ router.put('/clients/:identification',  validateToken,  updateClient)
  *       404:
  *         description: Cliente no encontrado
  */
-router.delete('/clients/:identification', validateToken,   deleteClient)
+router.delete('/clients/:company/:identification',   deleteClient)
 
 export default router

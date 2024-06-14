@@ -1,17 +1,25 @@
 
 import { User } from '../models/user.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne} from "./general.controller.js"
+import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin} from "./general.controller.js"
 import jwt from 'jsonwebtoken'
+import { Rol } from '../models/rol.model.js';
 import {config} from 'dotenv'
+import bcrypt from 'bcrypt'
 
 config()
 
 const namePrimaryKey='identification'
 
 
+
 //Metodo que devuelve todos los usuarios
 export const getUsers = async(req,res)=> {
-        const result = await getAllModels(User);
+        const result = await getAllModelsWithJoin(User,
+            ['identification','name','lastname','username','phone','email','status','password','id_campus'],
+            [
+                {model: Rol,required: true,attributes: ['name']},
+            ]
+        );
         if (result.success) {
             res.status(result.status).json(result.models);
         } else {
@@ -22,7 +30,12 @@ export const getUsers = async(req,res)=> {
 //Metodo que devuelve un usuario por su id
 export const getUserById = async(req,res)=>{
     const { identification } = req.params;
-    const result = await getModelById(User, identification);
+    const result = await getModelByIdWithJoin(User, identification,
+        ['identification','name','lastname','username','phone','email','status', 'id_campus'],
+        [
+            {model: Rol,required: true,attributes: ['name']},
+        ]
+    );
     if (result.success) {
         res.status(result.status).json(result.model);
     } else {
@@ -34,16 +47,20 @@ export const getUserById = async(req,res)=>{
 //Metodo que crea un nuevo usuario
 //Parametros: identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_company
 export const createUser =  async(req,res)=> {
-    const { identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_company } = req.body;
-
+    const { identification, name, lastname, username, status, photo, email, phone, id_rol, id_campus } = req.body;
+    let {password} = req.body;
     if(!name) return res.status(400).json({message:"Fill all fields"})
     
-    const existingRol = await User.findOne({ where: { identification: identification } });
-    if (existingRol) {
+    const existingUser = await User.findOne({ where: { identification: identification } });
+    const existingEmail = await User.findOne({ where: { email: email } });
+    if (existingUser || existingEmail) {
         return res.status(400).json({ message: 'Cannot create a duplicate user' });
     }
+    const saltRounds = 10; // Número de rondas de hashing (mayor es más seguro pero más lento)
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    password = hashedPassword
 
-    const result = await createModel(User, { identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_company });
+    const result = await createModel(User, { identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_campus });
     if (result.success) {
         res.status(result.status).json({ message: 'User created' });
     } else {
@@ -102,15 +119,15 @@ export const deleteUser = async(req,res)=>{
     }
 }
 
-export const getUserByUsername = async(username,req,res)=>{
-    return await getModelByParameterOne(User, "username", username)
+export const getUserByEmail = async(email,req,res)=>{
+    return await getModelByParameterOne(User, "email", email)
 }
 
 export const UserLogin = async(req,res)=>{
-    const { password, username } = req.body;
-    const user = await getUserByUsername(username)
-    const passwordUser = user.model.dataValues.password
-    if(passwordUser == password){
+    const { password, email } = req.body;
+    const user = await getUserByEmail(email)
+    const hashedPassword = user.model.dataValues.password
+    if(bcrypt.compare(password, hashedPassword)){
         const accessToken = generateAccessToken(user);
         return res.status(200).json({ message: 'Logged', token:accessToken });
     }

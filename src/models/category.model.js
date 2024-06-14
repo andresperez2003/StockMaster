@@ -10,7 +10,7 @@ const Category = sequelize.define('Category', {
   },
   description: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   id_company: {
     type: DataTypes.STRING,

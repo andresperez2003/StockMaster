@@ -1,15 +1,16 @@
 
 import { Client } from '../models/client.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
 
 const namePrimaryKey = "identification"
 
 
 //Metodo que devuelve todos los clientes
 export const getClients = async(req,res)=> {
-        const result = await getAllModels(Client);
+        const {company} = req.params
+        const result = await getModelByParameterMany(Client, "id_company", company);
         if (result.success) {
-            res.status(result.status).json(result.models);
+            res.status(result.status).json(result.model);
         } else {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
@@ -17,12 +18,20 @@ export const getClients = async(req,res)=> {
 
 //Metodo que trae solo un cliente
 export const getClientById = async(req,res)=>{
-    const { identification } = req.params;
-    const result = await getModelById(Client, identification);
-    if (result.success) {
-        res.status(result.status).json(result.model);
-    } else {
-        res.status(result.status).json({ message: 'Client not found', error: result.error });
+    const { company, identification } = req.params;
+
+
+    const clients = await getModelByParameterMany(Client, "id_company", company);
+    let clientFound = false;
+    for (const campusObj of clients.model) {
+        if (campusObj.identification == identification) {
+            clientFound = true
+            return res.status(clients.status).json({ Client:campusObj }); 
+        }
+    }
+
+    if (!clientFound) {
+        return res.status(404).json({ message: 'Product not found' });
     }
 }
 
@@ -31,7 +40,8 @@ export const getClientById = async(req,res)=>{
 //Parametros: identification, name, lastname, email, status, phone, id_city, id_company, address
 export const createClient =  async(req,res)=> {
     const { identification, name, lastname, email, status, phone, id_city, id_company, address } = req.body;
-
+    console.log(identification, name, lastname, email, status, phone, id_city, id_company, address);
+    
     if(!name || !identification || !lastname || !email || !id_city  || !phone || !id_company || !address) return res.status(400).json({message:"Fill all fields"})
     
     const existingClient = await Client.findOne({ where: { identification: identification } });
@@ -85,11 +95,22 @@ export const updateClient = async (req, res) => {
 //Metodo que elimina un cliente
 //Parametros: identification
 export const deleteClient = async(req,res)=>{
-    const { identification } = req.params;
-    const result = await deleteModel(Client, identification, namePrimaryKey);
-    if (result.success) {
-        res.status(result.status).json({ message: 'Client deleted' });
-    } else {
-        res.status(result.status).json({ message: result.message, error: result?.error });
+    const { company, identification } = req.params;
+    const clients = await getModelByParameterMany(Client, "id_company", company)
+    let clientFounds = false;
+    for (const campusObj of clients.model) {
+        if (campusObj.identification == identification) {
+            const result = await deleteModel(Client,identification,"identification");
+            if (result.success) { 
+                clientFounds= true;
+                return res.status(result.status).json({ message: 'Client deleted' });
+            } else {
+                return res.status(result.status).json({ message: result.message, error: result?.error });
+            }
+        }
+    }
+
+    if (!clientFounds) {
+        return res.status(404).json({ message: 'Client not found' });
     }
 }

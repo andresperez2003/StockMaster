@@ -54,7 +54,7 @@ router.get('/sales/:id', validateToken,  getSaleById)
  *           schema:
  *             type: object
  *             properties:
- *               id_roduct:
+ *               id_product:
  *                 type: string
  *                 description: Producto de la venta
  *               quantity:

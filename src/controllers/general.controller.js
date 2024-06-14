@@ -76,3 +76,31 @@ export const getAllModels = async (Model) => {
         return { success: false, error: error.message, status:500, message:"Something went wrong" };
     }
 };
+
+export const getAllModelsWithJoin = async (Model,attributes, joins) => {
+    try {
+        console.log(attributes);
+        const models = await Model.findAll({
+            include: joins.length > 0 ? joins : undefined,
+            attributes: attributes.length > 0 ? attributes : undefined
+        });
+        return { success: true, models, status:200 };
+    } catch (error) {
+        return { success: false, error: error.message, status:500, message:"Something went wrong" };
+    }
+};
+
+export const getModelByIdWithJoin = async (Model, id, attributes, joins) => {
+    try {
+        const model = await Model.findByPk(id,{
+            attributes:attributes.length > 0 ? attributes : undefined,
+            include: joins.length > 0 ? joins : undefined
+        });
+        if (!model) {
+            return { success: false, error: 'Model not found', status:404 };
+        }
+        return { success: true, model, status:200 };
+    } catch (error) {
+        return { success: false, error: error.message, status:500,  message: 'Something went wrong'  };
+    }
+};

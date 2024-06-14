@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getRoles,getRolById, createRol, updateRol, deleteRol} from '../controllers/rol.controller.js'
+import {getRoles,getRolById, createRol, updateRol, deleteRol, deleteRolByCompany} from '../controllers/rol.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Rols    
  */
-router.get('/rols', validateToken,  getRoles)
+router.get('/rols',  getRoles)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/rols', validateToken,  getRoles)
  *       404:
  *         description: Rol no encontrado
  */
-router.get('/rols/:id', validateToken,  getRolById)
+router.get('/rols/:id',  getRolById)
 
 
 
@@ -71,7 +71,7 @@ router.get('/rols/:id', validateToken,  getRolById)
  *         description: Rol creado
 
  */
-router.post('/rols', validateToken,   createRol)
+router.post('/rols',   createRol)
 
 
 /**
@@ -110,7 +110,7 @@ router.post('/rols', validateToken,   createRol)
  *       404:
  *         description: Rol no encontrado
  */
-router.put('/rols/:id', validateToken,   updateRol)
+router.put('/rols/:id',   updateRol)
 
 
 /**
@@ -133,7 +133,29 @@ router.put('/rols/:id', validateToken,   updateRol)
  *       404:
  *         description: Rol no encontrado
  */
-router.delete('/rols/:id', validateToken,   deleteRol)
+router.delete('/rols/:id',   deleteRol)
+
+/**
+ * @swagger
+ * /api/v1/rols/{company}/{id}:
+ *   delete:
+ *     summary: Elimina un rol por su id
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: id del rol
+ *         schema:
+ *           type: string
+ *     tags:
+ *       - Rols
+ *     responses:
+ *       204:
+ *         description: Rol eliminado
+ *       404:
+ *         description: Rol no encontrado
+ */
+router.delete('/rols/:company/:id', deleteRolByCompany)
 
 
 

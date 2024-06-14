@@ -29,7 +29,7 @@ router.get('/companies', getCompanies)
  *     tags:
  *       - Companies    
  */
-router.get('/companies/active', validateToken,  getCompanyOnlyActive)
+router.get('/companies/active',  getCompanyOnlyActive)
 
 /**
  * @swagger
@@ -42,7 +42,7 @@ router.get('/companies/active', validateToken,  getCompanyOnlyActive)
  *     tags:
  *       - Companies    
  */
-router.get('/companies/inactive', validateToken,  getCompanyOnlyInactive)
+router.get('/companies/inactive',  getCompanyOnlyInactive)
 
 
 /**
@@ -65,7 +65,7 @@ router.get('/companies/inactive', validateToken,  getCompanyOnlyInactive)
  *       404:
  *         description: Compañia no encontrada
  */
-router.get('/companies/:id', validateToken,  getCompanyById)
+router.get('/companies/:id',  getCompanyById)
 
 
 /**
@@ -107,7 +107,7 @@ router.get('/companies/:id', validateToken,  getCompanyById)
  *       201:
  *         description: Compañia creada
  */
-router.post('/companies', validateToken,   createCompany)
+router.post('/companies',   createCompany)
 
 
 /**
@@ -143,7 +143,7 @@ router.post('/companies', validateToken,   createCompany)
  *       404:
  *         description: Compañia no encontrad
  */
-router.put('/companies/:id', validateToken,   updateCompany)
+router.put('/companies/:id',   updateCompany)
 
 
 /**
@@ -166,7 +166,7 @@ router.put('/companies/:id', validateToken,   updateCompany)
  *       404:
  *         description: Compania no encontrada
  */
-router.delete('/companies/:id', validateToken,   deleteCompany)
+router.delete('/companies/:id',   deleteCompany)
 
 
 

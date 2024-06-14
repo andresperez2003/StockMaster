@@ -16,12 +16,12 @@ const router = Router()
  *     tags:
  *       - Products    
  */
-router.get('/products', validateToken,  getProducts)
+router.get('/products/:company',  getProducts)
 
 
 /**
  * @swagger
- * /api/v1/products/{id}:
+ * /api/v1/products/{product}/{id}:
  *   get:
  *     summary: Retorna un product por su id
  *     parameters:
@@ -39,7 +39,7 @@ router.get('/products', validateToken,  getProducts)
  *       404:
  *         description: Producto no encontrado
  */
-router.get('/products/:id', validateToken,  getProductById)
+router.get('/products/:company/:id',  getProductById)
 
 
 /**
@@ -90,7 +90,7 @@ router.get('/products/:id', validateToken,  getProductById)
  *         description: Usuario editado
 
  */
-router.post('/products', validateToken,   createProduct)
+router.post('/products',   createProduct)
 
 
 
@@ -147,13 +147,13 @@ router.post('/products', validateToken,   createProduct)
  *         description: Producto creado
 
  */
-router.put('/products/:id', validateToken,  updateProduct)
+router.put('/products/:id',  updateProduct)
 
 
 
 /**
  * @swagger
- * /api/v1/products/{id}:
+ * /api/v1/products/{company}/{id}:
  *   delete:
  *     summary: Elimina un producto por su id
  *     parameters:
@@ -171,6 +171,6 @@ router.put('/products/:id', validateToken,  updateProduct)
  *       404:
  *         description: Producto no encontrado
  */
-router.delete('/products/:id', validateToken,   deleteProduct)
+router.delete('/products/:company/:id',   deleteProduct)
 
 export default router

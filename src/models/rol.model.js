@@ -10,7 +10,7 @@ const Rol = sequelize.define('Rol', {
   },
   description: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   id_company: {
     type: DataTypes.STRING,

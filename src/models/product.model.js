@@ -8,11 +8,11 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  price: {
+  price_sell: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  quantity: {
+  price_sale: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
@@ -30,7 +30,7 @@ const Product = sequelize.define('Product', {
   },
   discount: {
     type: DataTypes.FLOAT,
-    allowNull: false
+    allowNull: true
   },
   id_category: {
     type: DataTypes.INTEGER,

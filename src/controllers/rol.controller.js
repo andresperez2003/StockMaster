@@ -1,7 +1,7 @@
 
 import { json } from 'sequelize';
 import { Rol } from '../models/rol.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
 
 
 
@@ -85,5 +85,28 @@ export const deleteRol = async(req,res)=>{
         res.status(result.status).json({ message: 'Rol deleted' });
     } else {
         res.status(result.status).json({ message: result.message, error: result?.error });
+    }
+}
+
+//Metodo que elimina una compañia
+//Parametros: id
+export const deleteRolByCompany = async(req,res)=>{
+    const { company, id } = req.params;
+    const rols = await getModelByParameterMany(Rol, "id_company", company)
+    let rolFound = false;
+    for (const campusObj of rols.model) {
+        if (campusObj.id == id) {
+            const result = await deleteModel(Rol, id);
+            if (result.success) { 
+                rolFound= true;
+                return res.status(result.status).json({ message: 'Rol deleted' });
+            } else {
+                return res.status(result.status).json({ message: result.message, error: result?.error });
+            }
+        }
+    }
+
+    if (!rolFound) {
+        return res.status(404).json({ message: 'Rol not found' });
     }
 }
