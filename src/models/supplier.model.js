@@ -12,10 +12,6 @@ const Supplier = sequelize.define('Supplier', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  photo: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   name_seller: {
     type: DataTypes.STRING,
     allowNull: false

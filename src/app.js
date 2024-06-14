@@ -24,6 +24,7 @@ import clientRoutes from './routes/client.route.js';
 import billRoutes from './routes/bill.route.js';
 import saleRoutes from './routes/sale.route.js';
 import campusRouter from './routes/campus.route.js';
+import statusBillRouter from './routes/statusBill.route.js';
 
 
 
@@ -90,6 +91,8 @@ app.use('/api/v1', clientRoutes);
 app.use('/api/v1', billRoutes);
 app.use('/api/v1', saleRoutes);
 app.use('/api/v1', campusRouter);
+app.use('/api/v1', statusBillRouter);
+
 
 
 

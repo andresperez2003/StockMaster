@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getProducts, getProductById, createProduct, updateProduct, deleteProduct} from '../controllers/product.controller.js'
+import {getProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductPerCategory} from '../controllers/product.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -40,6 +40,9 @@ router.get('/products/:company',  getProducts)
  *         description: Producto no encontrado
  */
 router.get('/products/:company/:id',  getProductById)
+
+
+router.get('/productsByCategory/menu/:company',  getProductPerCategory)
 
 
 /**

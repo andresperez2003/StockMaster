@@ -27,7 +27,7 @@ const router = Router()
  *     tags:
  *       - Bills    
  */
-router.get('/bills', validateToken, getBills)
+router.get('/bills/:campus', getBills)
 
 
 /**
@@ -50,7 +50,7 @@ router.get('/bills', validateToken, getBills)
  *       404:
  *         description: Factura no encontrada
  */
-router.get('/bills/:id', validateToken, getBillsById)
+router.get('/bills/:campus/:id', getBillsById)
 
 
 /**
@@ -93,7 +93,7 @@ router.get('/bills/:id', validateToken, getBillsById)
  *         description: Factura creada
 
  */
-router.post('/bills', validateToken,  createBill)
+router.post('/bills',  createBill)
 
 
 /**
@@ -144,7 +144,7 @@ router.post('/bills', validateToken,  createBill)
  *       404:
  *         description: Factura no encontrada
  */
-router.put('/bills/:id', validateToken,  updateBill)
+router.put('/bills/:id',  updateBill)
 
 
 /**
@@ -167,7 +167,7 @@ router.put('/bills/:id', validateToken,  updateBill)
  *       404:
  *         description: Factura no encontrada
  */
-router.delete('/bills/:id', validateToken,  deleteBill)
+router.delete('/bills/:campus/:id',  deleteBill)
 
 
 

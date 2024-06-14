@@ -16,12 +16,12 @@ const router = Router()
  *     tags:
  *       - Suppliers    
  */
-router.get('/suppliers',  validateToken, getSuppliers)
+router.get('/suppliers/:company', getSuppliers)
 
 
 /**
  * @swagger
- * /api/v1/suppliers/{id}:
+ * /api/v1/suppliers/{company}/{id}:
  *   get:
  *     summary: Retorna un proveedor por su id
  *     parameters:
@@ -39,7 +39,7 @@ router.get('/suppliers',  validateToken, getSuppliers)
  *       404:
  *         description: Proveedor no encontrado
  */
-router.get('/suppliers/:id', validateToken,  getSupplierById)
+router.get('/suppliers/:company/:id',  getSupplierById)
 
 
 
@@ -77,7 +77,7 @@ router.get('/suppliers/:id', validateToken,  getSupplierById)
  *         description: Proveedor creado
 
  */
-router.post('/suppliers', validateToken,   createSupplier)
+router.post('/suppliers',   createSupplier)
 
 
 /**
@@ -122,7 +122,7 @@ router.post('/suppliers', validateToken,   createSupplier)
  *       404:
  *         description: Proveedor no encontrado
  */
-router.put('/suppliers/:id', validateToken,   updateSupplier)
+router.put('/suppliers/:id',   updateSupplier)
 
 
 /**
@@ -145,7 +145,7 @@ router.put('/suppliers/:id', validateToken,   updateSupplier)
  *       404:
  *         description: Proveedor no encontrado
  */
-router.delete('/suppliers/:id',  validateToken,  deleteSupplier)
+router.delete('/suppliers/:company/:id',  deleteSupplier)
 
 
 

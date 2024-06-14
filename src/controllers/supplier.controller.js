@@ -1,15 +1,16 @@
 
 import { json } from 'sequelize';
 import { Supplier } from '../models/supplier.model.js';
-import {getAllModels, getModelById, createModel, updateModel, deleteModel} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
 
 
 
 //Metodo que devuelve todos los proveedores
 export const getSuppliers = async(req,res)=> {
-        const result = await getAllModels(Supplier);
+    const {company} = req.params
+        const result = await getModelByParameterMany(Supplier,"id_company",company);
         if (result.success) {
-            res.status(result.status).json(result.models);
+            res.status(result.status).json(result.model);
         } else {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
@@ -18,22 +19,24 @@ export const getSuppliers = async(req,res)=> {
 //Metodo que trae un proveedor especifico
 //Parametros: id
 export const getSupplierById = async(req,res)=>{
-    const { id } = req.params;
-    const result = await getModelById(Supplier, id);
-    if (result.success) {
-        res.status(result.status).json(result.model);
-    } else {
-        res.status(result.status).json({ message: 'Supplier not found', error: result.error });
+    const { company, id } = req.params;
+    const suppliers = await getModelByParameterMany(Supplier, "id_company",company);
+    for (const campusObj of suppliers.model) {
+        if (campusObj.id == id) {
+            return res.status(suppliers.status).json({Supplier:campusObj});
+        }
     }
+    return res.status(products.status).json({ message: 'Supplier not found', error: suppliers.error });
+    
 }
 
 
 //Metodo que crea un nuevo proveedor
 //Parametros: name, phone, name_seller, photo, id_compan
 export const createSupplier =  async(req,res)=> {
-    const { name, phone, name_seller, photo, id_company } = req.body;
+    const { name, phone, name_seller, id_company } = req.body;
 
-    if(!name  || !phone || !name_seller || !photo || !id_company) return res.status(400).json({message:"Fill all fields"})
+    if(!name  || !phone || !name_seller || !id_company) return res.status(400).json({message:"Fill all fields"})
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
     const existingSupplier = await Supplier.findOne({ where: { name: nameCapitalize } });
@@ -41,7 +44,7 @@ export const createSupplier =  async(req,res)=> {
         return res.status(400).json({ message: 'Cannot create a duplicate supplier' });
     }
 
-    const result = await createModel(Supplier, { name, phone, name_seller, photo, id_company });
+    const result = await createModel(Supplier, { name, phone, name_seller, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'Supplier created' });
     } else {
@@ -83,11 +86,22 @@ export const updateSupplier = async(req,res)=>{
 //Metodo que elimina una proveedor
 //Parametros: id
 export const deleteSupplier = async(req,res)=>{
-    const { id } = req.params;
-    const result = await deleteModel(Supplier, id);
-    if (result.success) {
-        res.status(result.status).json({ message: 'Supplier deleted' });
-    } else {
-        res.status(result.status).json({ message: result.message, error: result?.error });
+    const { company, id } = req.params;
+    const suppliers = await getModelByParameterMany(Supplier, "id_company", company)
+    let supplierFound = false;
+    for (const campusObj of suppliers.model) {
+        if (campusObj.id == id) {
+            const result = await deleteModel(Supplier, id);
+            if (result.success) { 
+                supplierFound= true;
+                return res.status(result.status).json({ message: 'Supplier deleted' });
+            } else {
+                return res.status(result.status).json({ message: result.message, error: result?.error });
+            }
+        }
+    }
+
+    if (!supplierFound) {
+        return res.status(404).json({ message: 'Supplier not found' });
     }
 }

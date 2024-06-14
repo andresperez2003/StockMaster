@@ -68,6 +68,24 @@ export const getModelByParameterMany = async (Model, parameter, value) => {
     }
 };
 
+export const getModelByParameterManyWithJoin = async (Model, parameter,value , atribute,joins) => {
+    try {
+        const model = await Model.findAll(
+            { 
+                attributes:atribute.length >0 ? atribute:undefined,
+                include:joins.length >0 ? joins:undefined,
+                where: { [parameter]: value }  
+            }
+        );
+        if (!model) {
+            return { success: false, error: 'Model not found', status:404 };
+        }
+        return { success: true, model, status:200 };
+    } catch (error) {
+        return { success: false, error: error.message, status:500,  message: 'Something went wrong'  };
+    }
+};
+
 export const getAllModels = async (Model) => {
     try {
         const models = await Model.findAll();
@@ -89,6 +107,8 @@ export const getAllModelsWithJoin = async (Model,attributes, joins) => {
         return { success: false, error: error.message, status:500, message:"Something went wrong" };
     }
 };
+
+
 
 export const getModelByIdWithJoin = async (Model, id, attributes, joins) => {
     try {

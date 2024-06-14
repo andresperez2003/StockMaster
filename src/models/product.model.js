@@ -1,6 +1,7 @@
 // Importa Sequelize y la instancia de conexión a la base de datos
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la instancia de conexión a tu base de datos
+import {Category} from "../models/category.model.js"
 
 // Define el modelo de la tabla Product
 const Product = sequelize.define('Product', {
@@ -8,14 +9,15 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  price_sell: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
   price_sale: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+   price_unit: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  
   description: {
     type: DataTypes.STRING,
     allowNull: false
@@ -44,6 +46,9 @@ const Product = sequelize.define('Product', {
   tableName: 'product', // Nombre de la tabla en la base de datos
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
+
+Product.belongsTo(Category, { foreignKey: 'id_category' });
+
 
 // Exporta el modelo Product
 export { Product };

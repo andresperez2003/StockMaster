@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getSales, getSaleById, updateSale, createSale, deleteSale} from '../controllers/sale.controller.js'
+import {getSales, getSaleById, updateSale, createSale, deleteSale, getSaleByBill} from '../controllers/sale.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Sales    
  */
-router.get('/sales', validateToken,  getSales)
+router.get('/sales/:campus',  getSales)
 
 
 /**
@@ -39,8 +39,10 @@ router.get('/sales', validateToken,  getSales)
  *       404:
  *         description: Venta no encontrada
  */
-router.get('/sales/:id', validateToken,  getSaleById)
+router.get('/sales/:campus/:id',  getSaleById)
 
+
+router.get('/salesByBill/:campus/:bill',  getSaleByBill)
 
 /**
  * @swagger
@@ -73,7 +75,7 @@ router.get('/sales/:id', validateToken,  getSaleById)
  *         description: Venta creada
 
  */
-router.post('/sales', validateToken,  createSale)
+router.post('/sales',  createSale)
 
 
 /**
@@ -115,7 +117,7 @@ router.post('/sales', validateToken,  createSale)
  *       404:
  *         description: Venta no encontrada
  */
-router.put('/sales/:id', validateToken,  updateSale)
+router.put('/sales/:id',  updateSale)
 
 
 /**
@@ -138,7 +140,7 @@ router.put('/sales/:id', validateToken,  updateSale)
  *       404:
  *         description: Venta no encontrada
  */
-router.delete('/sales/:id', validateToken,   deleteSale)
+router.delete('/sales/:campus/:id',   deleteSale)
 
 
 

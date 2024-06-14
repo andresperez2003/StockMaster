@@ -8,19 +8,15 @@ const Part = sequelize.define('Part', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  quantity: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  price: {
+  price_sale: {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  photo: {
-    type: DataTypes.STRING,
+  price_unit: {
+    type: DataTypes.INTEGER,
     allowNull: false
   },
-  unit: {
+  photo: {
     type: DataTypes.STRING,
     allowNull: false
   },

@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Parts    
  */
-router.get('/parts', validateToken,  getParts)
+router.get('/parts/:company',  getParts)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/parts', validateToken,  getParts)
  *       404:
  *         description: Parte no encontrado
  */
-router.get('/parts/:id', validateToken,  getPartById)
+router.get('/parts/:company/:id',  getPartById)
 
 
 
@@ -81,7 +81,7 @@ router.get('/parts/:id', validateToken,  getPartById)
  *         description: Parte creado
 
  */
-router.post('/parts', validateToken,   createPart)
+router.post('/parts',   createPart)
 
 
 /**
@@ -124,7 +124,7 @@ router.post('/parts', validateToken,   createPart)
  *       404:
  *         description: Parte no encontrada
  */
-router.put('/parts/:id', validateToken,   updatePart)
+router.put('/parts/:id',   updatePart)
 
 
 /**
@@ -147,7 +147,7 @@ router.put('/parts/:id', validateToken,   updatePart)
  *       404:
  *         description: Parte no encontrada
  */
-router.delete('/parts/:id', validateToken,   deletePart)
+router.delete('/parts/:company/:id',   deletePart)
 
 
 

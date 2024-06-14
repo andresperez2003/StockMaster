@@ -1,15 +1,16 @@
 
 import { Bill } from '../models/bill.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany} from "./general.controller.js"
 
 
 
 
 //Metodo que devuelve todos las categorias
 export const getBills = async(req,res)=> {
-        const result = await getAllModels(Bill);
+        const {campus} = req.params
+        const result = await getModelByParameterMany(Bill,"id_campus",campus);
         if (result.success) {
-            res.status(result.status).json(result.models);
+            res.status(result.status).json(result.model);
         } else {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
@@ -17,25 +18,29 @@ export const getBills = async(req,res)=> {
 
 //Metodo que trae una categoria
 //Parametros: id
+
+//Arreglar este metodo
 export const getBillsById = async(req,res)=>{
-    const { id } = req.params;
-    const result = await getModelById(Bill, id);
-    if (result.success) {
-        res.status(result.status).json(result.model);
-    } else {
-        res.status(result.status).json({ message: 'Bill not found', error: result.error });
+    const { campus, id } = req.params;
+    const bills = await getModelByParameterMany(Bill,"id_campus", campus);
+    for (const campusObj of bills.model) {
+        if (campusObj.id == id) {
+            return res.status(bills.status).json({Bill:campusObj});
+        }
     }
+    return res.status(bills.status).json({ message: 'Bill not found', error: bills.error });
+    
 }
 
 
 //Metodo que crea una nueva categoria
 //Parametros: name, description
 export const createBill =  async(req,res)=> {
-    const { id, date_bill, id_company, status, id_user, id_client, end_date } = req.body;
+    const { id, date_bill, id_campus, status, id_user, id_client } = req.body;
+    console.log(id, date_bill, id_campus, status, id_user, id_client );
+    if( !id || !date_bill || !id_campus || !status || !id_user || !id_client ) return res.status(400).json({message:"Fill all fields"})
 
-    if( !id || !date_bill || !id_company || !status || !id_user || !id_client || !end_date ) return res.status(400).json({message:"Fill all fields"})
-
-    const result = await createModel(Category, {  id, date_bill, id_company, status, id_user, id_client, end_date});
+    const result = await createModel(Bill, {  id, date_bill, id_campus, status, id_user, id_client});
     if (result.success) {
         res.status(result.status).json({ message: 'Bill created' });
     } else {
@@ -76,11 +81,24 @@ export const updateBill = async(req,res)=>{
 //Metodo que elimina una categoria
 //Parametros: id
 export const deleteBill = async(req,res)=>{
-    const { id } = req.params;
-    const result = await deleteModel(Bill, id);
-    if (result.success) {
-        res.status(result.status).json({ message: 'Bill deleted' });
-    } else {
-        res.status(result.status).json({ message: result.message, error: result?.error });
+    const { campus, id } = req.params;
+    const bills = await getModelByParameterMany(Bill, "id_campus", campus);
+    
+    let billFound = false;
+
+    for (const campusObj of bills.model) {
+        if (campusObj.id == id) {
+            const result = await deleteModel(Bill, id);
+            if (result.success) { 
+                billFound = true;
+                return res.status(result.status).json({ message: 'Bill deleted' });
+            } else {
+                return res.status(result.status).json({ message: result.message, error: result?.error });
+            }
+        }
+    }
+
+    if (!billFound) {
+        return res.status(404).json({ message: 'Bill not found' });
     }
 }
