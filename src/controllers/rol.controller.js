@@ -65,19 +65,32 @@ export const createRol =  async(req,res)=> {
 //Metodo que actualiza un rol
 //Parametros: name, description
 export const updateRol = async(req,res)=>{
-    const { id } = req.params;
-    let { name, description } = req.body;
+    const { company, id } = req.params;
+    let { name, description, id_company } = req.body;
 
-    const rol =  await getModelById(Rol, id);
+    const rols =  await getModelByParameterMany(Rol, "id_company", company);
 
-    if(rol.success){
-        if (!name) name = rol.model.dataValues.name
-        if (!description) description = rol.model.dataValues.description
+
+    let rolSelected= null
+    let rolFound = false
+    rols.model.forEach(element => {
+        if(element.id == id ){
+            rolSelected = element
+            rolFound=true
+        }
+    });
+
+    if(!rolFound) return res.status(404).json({message:"Cat4egory not found"})
+
+    if(rols.success){
+        if (!name) name = rolSelected.name
+        if (!description) description = rolSelected.description
+        if (!id_company) id_company = rolSelected.id_company
     }else{
-        res.status(rol.status).json({ message: rol.message, error:rol.error });
+        res.status(rols.status).json({ message: rols.message, error:rols.error });
     }
 
-    const result = await updateModel(Rol, id, { name, description });
+    const result = await updateModel(Rol, id, { name, description, id_company });
     
     if (result.success) {
         res.status(result.status).json({ message: 'Rol updated' });

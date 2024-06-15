@@ -122,7 +122,7 @@ router.post('/suppliers',   createSupplier)
  *       404:
  *         description: Proveedor no encontrado
  */
-router.put('/suppliers/:id',   updateSupplier)
+router.put('/suppliers/:company/:id',   updateSupplier)
 
 
 /**

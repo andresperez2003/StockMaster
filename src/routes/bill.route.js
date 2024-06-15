@@ -144,7 +144,7 @@ router.post('/bills',  createBill)
  *       404:
  *         description: Factura no encontrada
  */
-router.put('/bills/:id',  updateBill)
+router.put('/bills/:campus/:id_bill',  updateBill)
 
 
 /**

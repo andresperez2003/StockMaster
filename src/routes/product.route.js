@@ -150,7 +150,7 @@ router.post('/products',   createProduct)
  *         description: Producto creado
 
  */
-router.put('/products/:id',  updateProduct)
+router.put('/products/:company/:id',  updateProduct)
 
 
 

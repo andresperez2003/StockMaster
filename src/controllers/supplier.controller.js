@@ -57,20 +57,34 @@ export const createSupplier =  async(req,res)=> {
 //Metodo que actualiza un proveedor
 //Parametros: id, name, phone, name_seller, photo, id_compan
 export const updateSupplier = async(req,res)=>{
-    const { id } = req.params;
+    const { company, id } = req.params;
     let { name, phone, name_seller, photo, id_company } = req.body;
 
-    const supplier =  await getModelById(Supplier, id);
+    const suppliers =  await getModelByParameterMany(Supplier, "id_company", company);
 
-    if(supplier.success){
-        if (!name) name = supplier.model.dataValues.name
-        if (!phone) phone = supplier.model.dataValues.phone
-        if (!name_seller) name_seller = supplier.model.dataValues.name_seller
-        if (!photo) photo = supplier.model.dataValues.photo
-        if (!id_company) id_company = supplier.model.dataValues.id_company
+    let supplierSelected= null
+    let supplierFound = false
+    suppliers.model.forEach(element => {
+        console.log(element);
+        if(element.id == id ){
+            supplierSelected = element
+            supplierFound=true
+        }
+    });
+
+    if(!supplierFound) return res.status(404).json({message:"Supplier not found"})
+    
+
+
+    if(suppliers.success){
+        if (!name) name = supplierSelected.name
+        if (!phone) phone = supplierSelected.phone
+        if (!name_seller) name_seller = supplierSelected.name_seller
+        if (!photo) photo = supplierSelected.photo
+        if (!id_company) id_company = supplierSelected.id_company
 
     }else{
-        res.status(supplier.status).json({ message: supplier.message, error:supplier.error });
+        res.status(suppliers.status).json({ message: suppliers.message, error:suppliers.error });
     }
 
     const result = await updateModel(Supplier, id, { name, phone, name_seller, photo, id_company });

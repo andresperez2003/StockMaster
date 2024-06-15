@@ -9,7 +9,7 @@ import { Category } from '../models/category.model.js';
 export const getSales = async(req,res)=> {
         const {campus} = req.params
         const result = await  getModelByParameterManyWithJoin(Sale, "id_campus", campus, 
-            ["quantity","id_bill"],
+            ["id","quantity","id_bill"],
             [
                 {model: Product,required: true, attributes:["id","name","price_sale","price_unit","description","photo","status","discount","id_company"]},
             ]
@@ -58,21 +58,34 @@ export const createSale =  async(req,res)=> {
 //Metodo que actualiza una vevnta
 //Parametros: name, description
 export const updateSale = async(req,res)=>{
-    const { id } = req.params;
-    let {  id_product, quantity, id_bill, id_company } = req.body;
+    const { campus, id } = req.params;
+    let {  id_product, quantity, id_bill, id_campus } = req.body;
 
-    const sale =  await getModelById(Sale, id);
+    const sales =  await getModelByParameterMany(Sale, "id_campus", campus);
 
-    if(bill.success){
-        if (!id_product || id_product=='') id_product = sale.model.dataValues.id_product
-        if (!quantity) quantity = sale.model.dataValues.quantity
-        if (!id_bill || id_bill=='') id_bill = sale.model.dataValues.id_bill
-        if (!id_company || id_company=='') id_company = sale.model.dataValues.id_company
+    let saleSelected= null
+    let saleFound = false
+    sales.model.forEach(element => {
+        if(element.id == id ){
+            saleSelected = element
+            saleFound=true
+        }
+    });
+
+    if(!saleFound) return res.status(404).json({message:"Sale not found"})
+    
+
+
+    if(sales.success){
+        if (!id_product || id_product=='') id_product = saleSelected.id_product
+        if (!quantity) quantity = saleSelected.quantity
+        if (!id_bill || id_bill=='') id_bill = saleSelected.id_bill
+        if (!id_campus || id_campus=='') id_campus = saleSelected.id_campus
     }else{
-        res.status(sale.status).json({ message: sale.message, error:sale.error });
+        res.status(sales.status).json({ message: sales.message, error:sales.error });
     }
 
-    const result = await updateModel(Sale, id, {  id_product, quantity, id_bill, id_company });
+    const result = await updateModel(Sale, id, {  id_product, quantity, id_bill, id_campus });
     
     if (result.success) {
         res.status(result.status).json({ message: 'Sale updated' });

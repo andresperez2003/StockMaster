@@ -142,7 +142,7 @@ router.post('/clients',   createClient)
  *         description: Cliente actualizado
 
  */
-router.put('/clients/:identification',  updateClient)
+router.put('/clients/:company/:identification',  updateClient)
 
 
 

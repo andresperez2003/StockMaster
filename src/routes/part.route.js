@@ -124,7 +124,7 @@ router.post('/parts',   createPart)
  *       404:
  *         description: Parte no encontrada
  */
-router.put('/parts/:id',   updatePart)
+router.put('/parts/:company/:id',   updatePart)
 
 
 /**

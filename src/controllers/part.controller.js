@@ -57,19 +57,33 @@ export const createPart =  async(req,res)=> {
 //Metodo que actualiza una parte
 //Parametros: id, name, quantity, price, unit, photo, id_company 
 export const updatePart = async(req,res)=>{
-    const { id } = req.params;
+    const { company,id } = req.params;
     let { name, quantity, price,unit, photo } = req.body;
 
-    const part =  await getModelById(Part, id);
+    const parts =  await getModelByParameterMany(Part, "id_company", company);
 
-    if(part.success){
-        if (!name || name=='') name = part.model.dataValues.name
-        if (!quantity) quantity = part.model.dataValues.quantity
-        if (!price) price = part.model.dataValues.price
-        if (!photo || photo=='') photo = part.model.dataValues.photo
-        if (!unit) unit = part.model.dataValues.unit
+    let partSelected= null
+    let partFound = false
+    parts.model.forEach(element => {
+        console.log(element);
+        if(element.id == id ){
+            partSelected = element
+            partFound=true
+        }
+    });
+
+    if(!partFound) return res.status(404).json({message:"Part not found"})
+    
+
+
+    if(parts.success){
+        if (!name || name=='') name = partSelected.name
+        if (!quantity) quantity = partSelected.quantity
+        if (!price) price = partSelected.price
+        if (!photo || photo=='') photo = partSelected.photo
+        if (!unit) unit = partSelected.unit
     }else{
-        res.status(part.status).json({ message: part.message, error:part.error });
+        res.status(parts.status).json({ message: parts.message, error:parts.error });
     }
 
     const result = await updateModel(Part, id, { name, quantity, price, unit, photo });

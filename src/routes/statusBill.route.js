@@ -18,7 +18,7 @@ router.get('/statusBillByName/:company/:name',  getStatusBillByName)
 router.post('/statusBill',  createStatusBill)
 
 
-router.put('/statusBill/:id',   updateStatusBill)
+router.put('/statusBill/:company/:id',   updateStatusBill)
 
 
 router.delete('/statusBill/:company/:id',   deleteStatusBill)

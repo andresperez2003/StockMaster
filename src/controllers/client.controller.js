@@ -62,22 +62,35 @@ export const createClient =  async(req,res)=> {
 //Metodo que actualiza un nuevo cliente
 //Parametros: identification, name, lastname, email, status, phone, id_city, id_company, address
 export const updateClient = async (req, res) => {
-    const { identification } = req.params;
+    const { company, identification } = req.params;
     let { name, lastname, email, status, id_city, phone, id_company, address } = req.body;
 
-    const client = await getModelById(Client, identification);
-    if (client.success) {
+    const clients = await getModelByParameterMany(Client, "id_company", company);
+    
+    let clientSelected= null
+    let clientFound = false
+    clients.model.forEach(element => {
+        console.log(element);
+        if(element.identification == identification ){
+            clientSelected = element
+            clientFound=true
+        }
+    });
+
+    if(!clientFound) return res.status(404).json({message:"Client not found"})
+    
+    if (clients.success) {
         // Update the variables only if they are not provided or empty
-        if (!name || name == '') name = client.model.dataValues.name;
-        if (!lastname || lastname == '') lastname = client.model.dataValues.lastname;
-        if (!email || photo == '') email = client.model.dataValues.email; // Should this be email instead of photo?
-        if (!phone || photo == '') phone = client.model.dataValues.phone; // Should this be phone instead of photo?
-        if (!id_city) id_city = client.model.dataValues.id_city;
-        if (!address || address=='') address = client.model.dataValues.address;
-        if (!id_company || id_company == '') id_company = client.model.dataValues.id_company;
+        if (!name || name == '') name = clientSelected.name;
+        if (!lastname || lastname == '') lastname = clientSelected.lastname;
+        if (!email || photo == '') email = clientSelected.email; // Should this be email instead of photo?
+        if (!phone || photo == '') phone = clientSelected.phone; // Should this be phone instead of photo?
+        if (!id_city) id_city = clientSelected.id_city;
+        if (!address || address=='') address = clientSelected.address;
+        if (!id_company || id_company == '') id_company = clientSelected.id_company;
     } else {
         // If user retrieval fails, send an error response and return from the function
-        return res.status(client.status).json({ message: client.message, error: client.error });
+        return res.status(clients.status).json({ message: clients.message, error: clients.error });
     }
 
     // Update the user model

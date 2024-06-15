@@ -64,25 +64,39 @@ export const createProduct =  async(req,res)=> {
 //Metodo que actualiza un producto
 //Parametros: id, name, price, quantity, description, photo, status,discount, id_category, id_company
 export const updateProduct = async(req,res)=>{
-    const { id } = req.params;
-    let { name, price_sell, price_sale, description, photo, status,discount, id_category, id_company } = req.body;
+    const { company, id } = req.params;
+    let { name, price_unit, price_sale, description, photo, status,discount, id_category, id_company } = req.body;
 
-    const product =  await getModelById(Product, id);
+    const products =  await getModelByParameterMany(Product, "id_company", company);
     //price unit
-    if(product.success){
-        if (!name) name = product.model.dataValues.name
-        if (!price_sale) price_sale = product.model.dataValues.price_sale
-        if (!price_sell) price_sell = product.model.dataValues.price_sell
-        if (!description) description = product.model.dataValues.description
-        if (!photo) photo = product.model.dataValues.photo
-        if (!discount) discount = product.model.dataValues.discount
-        if (!id_category) id_category = product.model.dataValues.id_category
-        if (!id_company) id_company = product.model.dataValues.id_company
+
+    let productSelected= null
+    let productFound = false
+    products.model.forEach(element => {
+        console.log(element);
+        if(element.id == id ){
+            productSelected = element
+            productFound=true
+        }
+    });
+
+    if(!productFound) return res.status(404).json({message:"Product not found"})
+
+
+    if(products.success){
+        if (!name) name = productSelected.name
+        if (!price_sale) price_sale = productSelected.price_sale
+        if (!price_unit) price_unit = productSelected.price_unit
+        if (!description) description = productSelected.description
+        if (!photo) photo = productSelected.photo
+        if (!discount) discount = productSelected.discount
+        if (!id_category) id_category = productSelected.id_category
+        if (!id_company) id_company = productSelected.id_company
     }else{
-        res.status(product.status).json({ message: product.message, error:product.error });
+        res.status(products.status).json({ message: products.message, error:products.error });
     }
 
-    const result = await updateModel(Product, id, { name, price,description, photo, status,discount, id_category, id_company });
+    const result = await updateModel(Product, id, { name, price_sale, price_unit,description, photo, status,discount, id_category, id_company });
     
     if (result.success) {
         res.status(result.status).json({ message: 'Product updated' });

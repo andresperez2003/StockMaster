@@ -53,22 +53,37 @@ export const createBill =  async(req,res)=> {
 //Metodo que actualiza una categoria
 //Parametros: name, description
 export const updateBill = async(req,res)=>{
-    const { id } = req.params;
-    let {  date_bill, id_company, status, id_user, id_client, end_date } = req.body;
+    let { campus, id_bill } = req.params;
+    let { id, date_bill, id_company, status, id_user, id_client } = req.body;
 
-    const bill =  await getModelById(Bill, id);
+    const bills =  await getModelByParameterMany(Bill, "id_campus", campus);
 
-    if(bill.success){
-        if (!date_bill) date_bill = bill.model.dataValues.date_bill
-        if (!id_company || id_company=='') id_company = bill.model.dataValues.id_company
-        if (!id_user || id_user=='') id_user = bill.model.dataValues.id_user
-        if (!id_client || id_client=='') id_client = bill.model.dataValues.id_client
-        if (!end_date) end_date = bill.model.dataValues.end_date
+
+
+    let billSelected= null
+    let billFound = false
+    bills.model.forEach(element => {
+        if(element.id == id_bill ){
+            billSelected = element
+            billFound=true
+        }
+    });
+
+    if(!billFound) return res.status(404).json({message:"Bill not found"})
+    
+
+
+    if(bills.success){
+        if (!id) id = billSelected.id
+        if (!date_bill) date_bill = billSelected.date_bill
+        if (!id_company || id_company=='') id_company = billSelected.id_company
+        if (!id_user || id_user=='') id_user = billSelected.id_user
+        if (!id_client || id_client=='') id_client = billSelected.id_client
     }else{
-        res.status(bill.status).json({ message: bill.message, error:bill.error });
+        res.status(bills.status).json({ message: bills.message, error:bills.error });
     }
 
-    const result = await updateModel(Bill, id, { date_bill, id_company, status, id_user, id_client, end_date });
+    const result = await updateModel(Bill, id_bill, { id, date_bill, id_company, status, id_user, id_client });
     
     if (result.success) {
         res.status(result.status).json({ message: 'Bill updated' });

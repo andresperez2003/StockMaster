@@ -61,19 +61,32 @@ export const createStatusBill =  async(req,res)=> {
 //Metodo que actualiza una categoria
 //Parametros: name, description
 export const updateStatusBill = async(req,res)=>{
-    const { id } = req.params;
+    const { company,id } = req.params;
     let { name, id_company } = req.body;
 
-    const statusBills =  await getModelById(statusBill, id);
+    const statusBills =  await getModelByParameterMany(statusBill, "id_company", company);
+
+
+    let statusBillSelected= null
+    let statusBillFound = false
+    statusBills.model.forEach(element => {
+        console.log(element);
+        if(element.id == id ){
+            statusBillSelected = element
+            statusBillFound=true
+        }
+    });
+
+    if(!statusBillFound) return res.status(404).json({message:"StatusBill not found"})
 
     if(statusBills.success){
-        if (!name) name = statusBills.model.dataValues.name
-        if (!id_company) id_company = statusBills.model.dataValues.id_company
+        if (!name) name = statusBillSelected.name
+        if (!id_company) id_company = statusBillSelected.id_company
     }else{
         res.status(statusBills.status).json({ message: statusBills.message, error:statusBills.error });
     }
 
-    const result = await updateModel(statusBills, id, { name, id_company });
+    const result = await updateModel(statusBill, id, { name, id_company });
     
     if (result.success) {
         res.status(result.status).json({ message: 'StatusBill updated' });

@@ -68,10 +68,11 @@ export const updateCategory = async(req,res)=>{
         console.log(element);
         if(element.id == id ){
             categorySelected = element
+            categoryFound=true
         }
     });
 
-    if(categoryFound) return res.status(404).json({message:"Cat4egory not found"})
+    if(!categoryFound) return res.status(404).json({message:"Category not found"})
 
     if (!name) name = categorySelected.name
     if (!description) description = categorySelected.description

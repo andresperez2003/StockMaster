@@ -117,7 +117,7 @@ router.post('/sales',  createSale)
  *       404:
  *         description: Venta no encontrada
  */
-router.put('/sales/:id',  updateSale)
+router.put('/sales/:campus/:id',  updateSale)
 
 
 /**
