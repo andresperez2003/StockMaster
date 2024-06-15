@@ -1,6 +1,6 @@
 
 import { Company } from '../models/company.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne} from "./general.controller.js"
 
 const namePrimaryKey='nit'
 
@@ -45,9 +45,21 @@ export const createCompany =  async(req,res)=> {
 //Metodo que actualiza una compañia
 //Parametros: name, id_masteruser, nit
 export const updateCompany = async(req,res)=>{
-        const { id } = req.params;
-    const { name, photo, address, status, id_city } = req.body;
-    const result = await updateModel(Company, id, { name, photo, address, status, id_city },namePrimaryKey);
+    const { nit } = req.params;
+    let { name, photo,phone, status, id_city } = req.body;
+
+
+    const company = await getModelByParameterOne(Company,"nit", nit) 
+    console.log(company.model.name);
+
+    if(!name) name =company.model.name
+    if(!photo) photo =company.model.photo
+    if(!phone) phone =company.model.phone
+    if(status==undefined) status =company.model.status
+    if(!id_city) id_city =company.model.id_city
+
+    console.log(status);
+    const result = await updateModel(Company, nit, { name, photo, phone, status, id_city },namePrimaryKey);
     
     if (result.success) {
         res.status(result.status).json({ message: 'Company updated' });

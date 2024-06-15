@@ -1,15 +1,16 @@
 
 import { json } from 'sequelize';
 import { Rol } from '../models/rol.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne} from "./general.controller.js"
 
 
 
 //Metodo que devuelve todos los roles
 export const getRoles = async(req,res)=> {
-        const result = await getAllModels(Rol);
+        const {company} = req.params
+        const result = await getModelByParameterMany(Rol,"id_company",company);
         if (result.success) {
-            res.status(result.status).json(result.models);
+            res.status(result.status).json(result.model);
         } else {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
@@ -18,13 +19,23 @@ export const getRoles = async(req,res)=> {
 //Metodo que trae un rol especifico
 //Parametros: id
 export const getRolById = async(req,res)=>{
-    const { id } = req.params;
-    const result = await getModelById(Rol, id);
-    if (result.success) {
-        res.status(result.status).json(result.model);
-    } else {
-        res.status(result.status).json({ message: 'Rol not found', error: result.error });
-    }
+    const { id,company } = req.params;
+    const result = await getModelByParameterMany(Rol, "id_company", company);
+
+    let rolFound=false
+    let rolSelected = null
+    result.model.forEach(element => {
+        if(element.id == id){
+            rolSelected=element
+            rolFound=true        
+        }
+    });
+    
+    if(rolFound) return res.status(result.status).json(rolSelected);
+    if(!rolFound) return res.status(404).json({ message: 'Rol not found', error: result.error });
+    
+        
+    
 }
 
 

@@ -1,6 +1,7 @@
 // Importa Sequelize y la instancia de conexión a la base de datos
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la instancia de conexión a tu base de datos
+import {Country} from '../models/country.model.js'
 
 // Define el modelo de la tabla Department
 const Department = sequelize.define('Department', {
@@ -16,6 +17,8 @@ const Department = sequelize.define('Department', {
   tableName: 'department', // Nombre de la tabla en la base de datos
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
+
+Department.belongsTo(Country, { foreignKey: 'id_country' });
 
 // Exporta el modelo Department
 export { Department };

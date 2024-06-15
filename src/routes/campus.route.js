@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Campus    
  */
-router.get('/campus',  getCampus)
+router.get('/campus/:company',  getCampus)
 
 
 /**
@@ -155,7 +155,7 @@ router.post('/campus',  createCampus)
  *       404:
  *         description: Sede no encontrada
  */
-router.put('/campus/:id',   updateCampus)
+router.put('/campus/:company/:id',   updateCampus)
 
 
 /**

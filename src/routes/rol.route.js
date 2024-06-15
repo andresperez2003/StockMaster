@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Rols    
  */
-router.get('/rols',  getRoles)
+router.get('/rols/:company',  getRoles)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/rols',  getRoles)
  *       404:
  *         description: Rol no encontrado
  */
-router.get('/rols/:id',  getRolById)
+router.get('/rols/:company/:id',  getRolById)
 
 
 
@@ -109,8 +109,8 @@ router.post('/rols',   createRol)
  *         description: Rol actualizado
  *       404:
  *         description: Rol no encontrado
- */
-router.put('/rols/:id',   updateRol)
+ */7
+router.put('/rols/:company/:id',   updateRol)
 
 
 /**

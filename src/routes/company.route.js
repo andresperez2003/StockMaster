@@ -143,7 +143,7 @@ router.post('/companies',   createCompany)
  *       404:
  *         description: Compañia no encontrad
  */
-router.put('/companies/:id',   updateCompany)
+router.put('/companies/:nit',   updateCompany)
 
 
 /**

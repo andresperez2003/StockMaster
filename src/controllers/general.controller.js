@@ -110,6 +110,8 @@ export const getAllModelsWithJoin = async (Model,attributes, joins) => {
 
 
 
+
+
 export const getModelByIdWithJoin = async (Model, id, attributes, joins) => {
     try {
         const model = await Model.findByPk(id,{

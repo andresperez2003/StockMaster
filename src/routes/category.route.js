@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Categories    
  */
-router.get('/categories',  getCategories)
+router.get('/categories/:company',  getCategories)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/categories',  getCategories)
  *       404:
  *         description: Categoria no encontrada
  */
-router.get('/categories/:id',  getCategoryById)
+router.get('/categories/:company/:id',  getCategoryById)
 
 
 /**
@@ -106,7 +106,7 @@ router.post('/categories',  createCategory)
  *       404:
  *         description: Categoria no encontrada
  */
-router.put('/categories/:id',   updateCategory)
+router.put('/categories/:company/:id',   updateCategory)
 
 
 /**
@@ -129,7 +129,7 @@ router.put('/categories/:id',   updateCategory)
  *       404:
  *         description: Categoria no encontrada
  */
-router.delete('/categories/:id',   deleteCategory)
+router.delete('/categories/:company/:id',   deleteCategory)
 
 
 

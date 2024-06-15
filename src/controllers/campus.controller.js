@@ -1,15 +1,29 @@
 
 import { Campus } from '../models/campus.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
-
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterManyWithJoin} from "./general.controller.js"
+import {City} from '../models/city.model.js'
+import { Department } from '../models/department.model.js';
+import { Country } from '../models/country.model.js';
+import {Company} from '../models/company.model.js'
 
 
 
 //Metodo que devuelve todos los campus
 export const getCampus = async(req,res)=> {
-        const result = await getAllModels(Campus);
+    const {company} = req.params
+        const result = await getModelByParameterManyWithJoin(Campus,"id_company", company,
+            ["id","name","address","phone","status","main_campus"],
+            [
+                {model: Company, required:true, attributes:["nit","name", "photo"]},
+                {model: City,required: true, attributes:["id","name","postal_code"], include:[
+                    {model:Department, required:true, attributes:["name"], include:[
+                        {model:Country, required:true,attributes:["name"]}
+                    ]}
+                ]}
+            ]
+        );
         if (result.success) {
-            res.status(result.status).json(result.models);
+            res.status(result.status).json(result.model);
         } else {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
@@ -60,19 +74,29 @@ export const createCampus =  async(req,res)=> {
 //Metodo que actualiza una categoria
 //Parametros: name, description
 export const updateCampus = async(req,res)=>{
-    const { id } = req.params;
+    const { company, id } = req.params;
     let {name, address, phone, id_city,status,main_campus, id_company  } = req.body;
 
-    const campus =  await getModelById(Campus, id);
+    const campus =  await getModelByParameterMany(Campus, "id_company", company);
+    let campusSelected= null
+    let campusFound = false
+    for(let campusObj in campus.model){
+        if(campusObj.id == id){
+            campusSelected=campusObj
+            campusFound = true
+        }
+    }
 
-    if(category.success){
-        if (!name) name = campus.model.dataValues.name
-        if (!address) address = campus.model.dataValues.address
-        if (!phone) phone = campus.model.dataValues.phone
-        if (!id_city) id_city  = campus.model.dataValues.id_city
-        if (!status) status = campus.model.dataValues.status
-        if (!main_campus) main_campus = campus.model.dataValues.main_campus
-        if (!id_company) id_company = campus.model.dataValues.id_company
+    if(campusFound) return res.status(404).json({message:"Campus not found"})
+
+    if(campus.success){
+        if (!name) name = campusSelected.name
+        if (!address) address = campusSelected.address
+        if (!phone) phone = campusSelected.phone
+        if (!id_city) id_city  = campusSelected.id_city
+        if (status == undefined) status = campusSelected.status
+        if (main_campus == undefined) main_campus = campusSelected.main_campus
+        if (!id_company) id_company = campusSelected.id_company
     }else{
         res.status(campus.status).json({ message: campus.message, error:campus.error });
     }

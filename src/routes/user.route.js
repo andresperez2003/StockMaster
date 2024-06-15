@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Users    
  */
-router.get('/users',  getUsers)
+router.get('/users/:campus',  getUsers)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/users',  getUsers)
  *       404:
  *         description: Usuario no encontrado
  */
-router.get('/users/:identification',  getUserById)
+router.get('/users/:campus/:identification',  getUserById)
 
 
 /**
@@ -151,7 +151,7 @@ router.post('/users',  createUser)
  *         description: Usuario creado
 
  */
-router.put('/users/:identification',   updateUser)
+router.put('/users/:campus/:identification',   updateUser)
 
 
 
@@ -175,7 +175,7 @@ router.put('/users/:identification',   updateUser)
  *       404:
  *         description: Usuario no encontrado
  */
-router.delete('/users/:identification',  deleteUser)
+router.delete('/users/:campus/:identification',  deleteUser)
 
 
 /**
