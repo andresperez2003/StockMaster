@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Countries    
  */
-router.get('/countries', validateToken,  getCountries)
+router.get('/countries',  getCountries)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/countries', validateToken,  getCountries)
  *       404:
  *         description: Pais no encontrado
  */
-router.get('/countries/:id', validateToken,  getCountryById)
+router.get('/countries/:id',  getCountryById)
 
 
 /**
@@ -62,7 +62,7 @@ router.get('/countries/:id', validateToken,  getCountryById)
  *       404:
  *         description: Pais no encontrado
  */
-router.get('/countries/:name', validateToken,  getCountryByName)
+router.get('/countriesByName/:name',  getCountryByName)
 
 
 
@@ -88,7 +88,7 @@ router.get('/countries/:name', validateToken,  getCountryByName)
  *         description: Pais creado
 
  */
-router.post('/countries', validateToken,   createCountry)
+router.post('/countries',   createCountry)
 
 
 /**
@@ -121,7 +121,7 @@ router.post('/countries', validateToken,   createCountry)
  *       404:
  *         description: Pais no encontrado
  */
-router.put('/countries/:id', validateToken,   updateCountry)
+router.put('/countries/:id',   updateCountry)
 
 
 /**
@@ -144,7 +144,7 @@ router.put('/countries/:id', validateToken,   updateCountry)
  *       404:
  *         description: Pais no encontrado
  */
-router.delete('/countries/:id', validateToken,   deleteCountry)
+router.delete('/countries/:id',   deleteCountry)
 
 
 

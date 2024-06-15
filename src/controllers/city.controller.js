@@ -30,8 +30,8 @@ export const getCityById = async(req,res)=>{
 //Metodo que crea una nueva ciudad
 //Parametros: name, id_department
 export const createCity =  async(req,res)=> {
-    const { name, id_department } = req.body;
-    const result = await createModel(City, { name, id_department });
+    const { name, id_department, postal_code } = req.body;
+    const result = await createModel(City, { name, id_department, postal_code });
     if (result.success) {
         res.status(result.status).json({ message: 'City created' });
     } else {

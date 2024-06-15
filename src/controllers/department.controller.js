@@ -47,7 +47,7 @@ export const createDepartment =  async(req,res)=> {
 export const updateDepartment = async(req,res)=>{
         const { id } = req.params;
     const { name, id_country } = req.body;
-    const result = await updateModel(Country, id, { name, id_country });
+    const result = await updateModel(Department, id, { name, id_country });
     
     if (result.success) {
         res.status(result.status).json({ message: 'Department updated' });

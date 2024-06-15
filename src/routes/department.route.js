@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Departments    
  */
-router.get('/departments', validateToken,  getDepartment)
+router.get('/departments',  getDepartment)
 
 /**
  * @swagger
@@ -38,7 +38,7 @@ router.get('/departments', validateToken,  getDepartment)
  *       404:
  *         description: Departamento no encontrado
  */
-router.get('/departments/:name', validateToken,  getDepartmentByName)
+router.get('/departments/name/:name',  getDepartmentByName)
 
 
 /**
@@ -61,7 +61,7 @@ router.get('/departments/:name', validateToken,  getDepartmentByName)
  *       404:
  *         description: Departamento no encontrado
  */
-router.get('/departments/country/:country', validateToken,  getDepartmentByCountry)
+router.get('/departments/country/:country',  getDepartmentByCountry)
 
 
 /**
@@ -84,7 +84,7 @@ router.get('/departments/country/:country', validateToken,  getDepartmentByCount
  *       404:
  *         description: Departamento no encontrado
  */
-router.get('/departments/:id', validateToken,  getDepartmentById)
+router.get('/departments/:id',  getDepartmentById)
 
 
 
@@ -110,7 +110,7 @@ router.get('/departments/:id', validateToken,  getDepartmentById)
  *         description: Departamento creado
 
  */
-router.post('/departments',  validateToken,  createDepartment)
+router.post('/departments',  createDepartment)
 
 
 /**
@@ -143,7 +143,7 @@ router.post('/departments',  validateToken,  createDepartment)
  *       404:
  *         description: Departamento no encontrado
  */
-router.put('/departments/:id',  validateToken,  updateDepartment)
+router.put('/departments/:id',  updateDepartment)
 
 
 /**
@@ -166,7 +166,7 @@ router.put('/departments/:id',  validateToken,  updateDepartment)
  *       404:
  *         description: Departamento no encontrado
  */
-router.delete('/departments/:id', validateToken,   deleteDepartment)
+router.delete('/departments/:id',   deleteDepartment)
 
 
 

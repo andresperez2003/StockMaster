@@ -76,10 +76,12 @@ export const getCountryByName = async(req,res)=>{
     const { name } = req.params;
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+    console.log(nameCapitalize);
     const result = await getModelByParameterOne(Country,"name" ,nameCapitalize);
     if (result.success) {
         res.status(result.status).json(result.model);
     } else {
+        console.log("Entra");
         res.status(result.status).json({ message: 'Country not found', error: result.error });
     }
 }

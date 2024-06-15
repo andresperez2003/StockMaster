@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Cities    
  */
-router.get('/cities', validateToken,  getCities)
+router.get('/cities',  getCities)
 
 /**
  * @swagger
@@ -38,7 +38,7 @@ router.get('/cities', validateToken,  getCities)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.get('/cities/:name', validateToken,  getCityByName)
+router.get('/cities/name/:name',  getCityByName)
 
 
 /**
@@ -61,7 +61,7 @@ router.get('/cities/:name', validateToken,  getCityByName)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.get('/cities/department/:department', validateToken,  getCityByDepartment)
+router.get('/cities/department/:department',  getCityByDepartment)
 
 
 /**
@@ -84,7 +84,7 @@ router.get('/cities/department/:department', validateToken,  getCityByDepartment
  *       404:
  *         description: Ciudad no encontrada
  */
-router.get('/cities/:id', validateToken,  getCityById)
+router.get('/cities/:id',  getCityById)
 
 
 
@@ -113,7 +113,7 @@ router.get('/cities/:id', validateToken,  getCityById)
  *         description: Ciudad creada
 
  */
-router.post('/cities', validateToken,   createCity)
+router.post('/cities',   createCity)
 
 
 /**
@@ -146,7 +146,7 @@ router.post('/cities', validateToken,   createCity)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.put('/cities/:id', validateToken,   updateCity)
+router.put('/cities/:id',   updateCity)
 
 
 /**
@@ -169,7 +169,7 @@ router.put('/cities/:id', validateToken,   updateCity)
  *       404:
  *         description: Ciudad no encontrada
  */
-router.delete('/cities/:id',  validateToken,  deleteCity)
+router.delete('/cities/:id',  deleteCity)
 
 
 
