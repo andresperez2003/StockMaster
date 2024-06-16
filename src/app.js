@@ -18,13 +18,29 @@ import productRoutes from './routes/product.route.js';
 import supplierRoutes from './routes/supplier.route.js';
 import partRoutes from './routes/part.route.js';
 import productoXPartRoute from './routes/productxpart.route.js';
-import productoXSupplierRoute from './routes/productxsupplier.js';
+import productoXSupplierRoute from './routes/productxsupplier.route.js';
 import supplierXPartRoutes from './routes/supplierxpart.route.js';
 import clientRoutes from './routes/client.route.js';
 import billRoutes from './routes/bill.route.js';
 import saleRoutes from './routes/sale.route.js';
 import campusRouter from './routes/campus.route.js';
 import statusBillRouter from './routes/statusBill.route.js';
+import operationRouter from './routes/operation.route.js';
+import moduleRouter from './routes/module.route.js';
+import permissRouter from './routes/permiss.route.js';
+import userXpermissRouter from './routes/userXpermiss.route.js';
+import rolXpermissRouter from './routes/rolXpermiss.route.js';
+import productXcampusRouter from './routes/productXcampus.route.js';
+import partXcampusRouter from './routes/partXcampus.route.js';
+import supplierXcampusRouter from './routes/supplierXcampus.route.js';
+import moduleXCompany from './routes/moduleXcompany.route.js';
+
+
+
+
+
+
+
 
 
 
@@ -92,6 +108,21 @@ app.use('/api/v1', billRoutes);
 app.use('/api/v1', saleRoutes);
 app.use('/api/v1', campusRouter);
 app.use('/api/v1', statusBillRouter);
+app.use('/api/v1', operationRouter);
+app.use('/api/v1', moduleRouter);
+app.use('/api/v1', permissRouter);
+app.use('/api/v1', rolXpermissRouter);
+app.use('/api/v1', userXpermissRouter);
+app.use('/api/v1', productXcampusRouter);
+app.use('/api/v1', partXcampusRouter);
+app.use('/api/v1', supplierXcampusRouter);
+app.use('/api/v1', moduleXCompany);
+
+
+
+
+
+
 
 
 

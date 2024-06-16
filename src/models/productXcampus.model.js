@@ -19,7 +19,7 @@ const ProductXCampus = sequelize.define('ProductXCampus', {
     allowNull: false
   }
 }, {
-  tableName: 'partxcampus', // Nombre de la tabla en la base de datos
+  tableName: 'productxcampus', // Nombre de la tabla en la base de datos
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
 

@@ -80,7 +80,7 @@ export const updateRol = async(req,res)=>{
         }
     });
 
-    if(!rolFound) return res.status(404).json({message:"Cat4egory not found"})
+    if(!rolFound) return res.status(404).json({message:"Rol not found"})
 
     if(rols.success){
         if (!name) name = rolSelected.name
@@ -100,21 +100,10 @@ export const updateRol = async(req,res)=>{
 }
  
 
-//Metodo que elimina una compañia
-//Parametros: id
-export const deleteRol = async(req,res)=>{
-    const { id } = req.params;
-    const result = await deleteModel(Rol, id);
-    if (result.success) {
-        res.status(result.status).json({ message: 'Rol deleted' });
-    } else {
-        res.status(result.status).json({ message: result.message, error: result?.error });
-    }
-}
 
 //Metodo que elimina una compañia
 //Parametros: id
-export const deleteRolByCompany = async(req,res)=>{
+export const deleteRol = async(req,res)=>{
     const { company, id } = req.params;
     const rols = await getModelByParameterMany(Rol, "id_company", company)
     let rolFound = false;

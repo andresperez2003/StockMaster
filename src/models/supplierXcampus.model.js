@@ -15,7 +15,7 @@ const SupplierXCampus = sequelize.define('SupplierXCampus', {
     allowNull: false
   }
 }, {
-  tableName: 'partxcampus', // Nombre de la tabla en la base de datos
+  tableName: 'supplierxcampus', // Nombre de la tabla en la base de datos
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
 

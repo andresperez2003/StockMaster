@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - ProductXPart    
  */
-router.get('/productXparts', validateToken,  getProductXParts)
+router.get('/productXparts/:company',  getProductXParts)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/productXparts', validateToken,  getProductXParts)
  *       404:
  *         description: Parte del producto no encontrado
  */
-router.get('/productXparts/:id',validateToken,  getProductXPartById)
+router.get('/productXparts/:company/:id',  getProductXPartById)
 
 
 
@@ -71,7 +71,7 @@ router.get('/productXparts/:id',validateToken,  getProductXPartById)
  *         description: Parte agregar al producto
 
  */
-router.post('/productXparts',  validateToken,  createProductXPart)
+router.post('/productXparts',  createProductXPart)
 
 
 /**
@@ -110,7 +110,7 @@ router.post('/productXparts',  validateToken,  createProductXPart)
  *       404:
  *         description: Parte del producto no encontrado
  */
-router.put('/productXparts/:id', validateToken,   updateProductXPart)
+router.put('/productXparts/:company/:id',   updateProductXPart)
 
 
 /**
@@ -133,7 +133,7 @@ router.put('/productXparts/:id', validateToken,   updateProductXPart)
  *       404:
  *         description: Parte del producto no encontrado
  */
-router.delete('/productXparts/:id',  validateToken,  deleteProductXPart)
+router.delete('/productXparts/:company/:id',  deleteProductXPart)
 
 
 

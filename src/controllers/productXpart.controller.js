@@ -1,15 +1,16 @@
 
 import { json } from 'sequelize';
 import { ProductXPart } from '../models/productXpart.model.js';
-import {getAllModels, getModelById, createModel, updateModel, deleteModel} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
 
 
 
 //Metodo que devuelve todos las partes de un producto
 export const getProductXParts = async(req,res)=> {
-        const result = await getAllModels(ProductXPart);
+        const { company } = req.params
+        const result = await getModelByParameterMany(ProductXPart,"id_company", company);
         if (result.success) {
-            res.status(result.status).json(result.models);
+            res.status(result.status).json(result.model);
         } else {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
@@ -18,13 +19,21 @@ export const getProductXParts = async(req,res)=> {
 //Metodo que trae la parte especifica de un producto
 //Parametros: id
 export const getProductXPartById = async(req,res)=>{
-    const { id } = req.params;
-    const result = await getModelById(ProductXPart, id);
-    if (result.success) {
-        res.status(result.status).json(result.model);
-    } else {
-        res.status(result.status).json({ message: 'ProductXPart not found', error: result.error });
-    }
+    const { company, id } = req.params;
+    const result = await getModelByParameterMany(ProductXPart, "id_company", company);
+
+    let productxpartFound=false
+    let productxpartSelected = null
+    result.model.forEach(element => {
+        if(element.id == id){
+            productxpartSelected=element
+            productxpartFound=true        
+        }
+    });
+    
+    if(productxpartFound) return res.status(result.status).json(productxpartSelected);
+    if(!productxpartFound) return res.status(404).json({ message: 'ProductXPart not found', error: result.error });
+    
 }
 
 
@@ -33,10 +42,10 @@ export const getProductXPartById = async(req,res)=>{
 export const createProductXPart =  async(req,res)=> {
     const { id_product, id_part, id_company } = req.body;
 
-    if( !id_part ||!id_product|| !id_company) return res.status(400).json({message:"Fill all fields"})
+    if( !id_part ||!id_product || !id_company) return res.status(400).json({message:"Fill all fields"})
     
 
-    const existingProductXPart = await ProductXPart.findOne({ where: { id_company: id_company, id_product: id_product, id_part: id_part  } });
+    const existingProductXPart = await ProductXPart.findOne({ where: { id_product: id_product, id_part: id_part, id_company:id_company  } });
     if (existingProductXPart) {
         return res.status(400).json({ message: 'Cannot add a duplicated part to a product' });
     }
@@ -54,20 +63,34 @@ export const createProductXPart =  async(req,res)=> {
 //Metodo que actualiza una pare de un producto
 //Parametros: id, id_product, id_part, id_company
 export const updateProductXPart = async(req,res)=>{
-    const { id } = req.params;
-    let { id_product, id_part, id_company } = req.body;
+    let { company , id } = req.params;
+    let { id_product, id_part,id_company } = req.body;
 
-    const productxpart =  await getModelById(ProductXPart, id);
+    const productxparts =  await getModelByParameterMany(ProductXPart, "id_company", company);
 
-    if(productxpart.success){
-        if (!id_product) id_product = productxpart.model.dataValues.id_product
-        if (!id_part) id_part = productxpart.model.dataValues.id_part
-        if (!id_company) id_company = productxpart.model.dataValues.id_company
+    let productxpartSelected= null
+    let productxpartFound = false
+    productxparts.model.forEach(element => {
+        if(element.id == id ){
+            productxpartSelected = element
+            productxpartFound=true
+        }
+    });
+
+    if(!productxpartFound) return res.status(404).json({message:"ProductXPart not found"})
+
+
+
+
+    if(productxparts.success){
+        if (!id_product) id_product = productxpartSelected.id_product
+        if (!id_part) id_part = productxpartSelected.id_part
+        if (!id_company) id_company = productxpartSelected.id_company
     }else{
-        res.status(productxpart.status).json({ message: part.message, error:part.error });
+        res.status(productxparts.status).json({ message: productxparts.message, error:productxparts.error });
     }
 
-    const result = await updateModel(ProductXPart, id, { id_product, id_part, id_company });
+    const result = await updateModel(ProductXPart, id, { id_product, id_part,id_company });
     
     if (result.success) {
         res.status(result.status).json({ message: 'Part of the product updated' });
@@ -80,11 +103,23 @@ export const updateProductXPart = async(req,res)=>{
 //Metodo que elimina una parte de un producto
 //Parametros: id
 export const deleteProductXPart = async(req,res)=>{
-    const { id } = req.params;
-    const result = await deleteModel(ProductXPart, id);
-    if (result.success) {
-        res.status(result.status).json({ message: 'Part of the product deleted' });
-    } else {
-        res.status(result.status).json({ message: result.message, error: result?.error });
+    const { company, id } = req.params;
+    const productxparts = await getModelByParameterMany(ProductXPart, "id_company", company)
+    let productxpartFound = false;
+
+    for (const campusObj of productxparts.model) {
+        if (campusObj.id == id) {
+            const result = await deleteModel(ProductXPart, id);
+            if (result.success) { 
+                productxpartFound= true;
+                return res.status(result.status).json({ message: 'ProductXPart deleted' });
+            } else {
+                return res.status(result.status).json({ message: result.message, error: result?.error });
+            }
+        }
+    }
+
+    if (!productxpartFound) {
+        return res.status(404).json({ message: 'ProductXPart not found' });
     }
 }

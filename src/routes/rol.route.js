@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getRoles,getRolById, createRol, updateRol, deleteRol, deleteRolByCompany} from '../controllers/rol.controller.js'
+import {getRoles,getRolById, createRol, updateRol, deleteRol} from '../controllers/rol.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -113,27 +113,6 @@ router.post('/rols',   createRol)
 router.put('/rols/:company/:id',   updateRol)
 
 
-/**
- * @swagger
- * /api/v1/rols/{id}:
- *   delete:
- *     summary: Elimina un rol por su id
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: id del rol
- *         schema:
- *           type: string
- *     tags:
- *       - Rols
- *     responses:
- *       204:
- *         description: Rol eliminado
- *       404:
- *         description: Rol no encontrado
- */
-router.delete('/rols/:id',   deleteRol)
 
 /**
  * @swagger
@@ -155,7 +134,7 @@ router.delete('/rols/:id',   deleteRol)
  *       404:
  *         description: Rol no encontrado
  */
-router.delete('/rols/:company/:id', deleteRolByCompany)
+router.delete('/rols/:company/:id', deleteRol)
 
 
 
