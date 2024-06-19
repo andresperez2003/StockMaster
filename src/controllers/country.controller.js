@@ -32,7 +32,15 @@ export const getCountryById = async(req,res)=>{
 //Parametros:  name
 export const createCountry =  async(req,res)=> {
     const {name } = req.body;
-    const result = await createModel(Country, { name });
+
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+    const existingCountry = await City.findOne({ where: { name: nameCapitalize } });
+    if (existingCountry) {
+        return res.status(400).json({ message: 'Cannot create a duplicate country' });
+    }
+
+    const result = await createModel(Country, { nameCapitalize });
     if (result.success) {
         res.status(result.status).json({ message: 'Country created' });
     } else {
@@ -45,8 +53,26 @@ export const createCountry =  async(req,res)=> {
 //Metodo que actualiza un pais
 //Parametros: id, name
 export const updateCountry = async(req,res)=>{
-        const { id } = req.params;
+    const { id } = req.params;
     const { name } = req.body;
+
+    const country = await getModelById(Country,id)
+
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    if (nameCapitalize != country.name) {
+        const existingOperation = await Operation.findOne({ where: { name: nameCapitalize } });
+        if(existingOperation) return res.status(400).json({ message: 'Cannot use a duplicate country name' });
+    }
+
+    if(!name){
+        name = operation.model.name
+    }else{
+        name = nameCapitalize
+    }
+
+
     const result = await updateModel(Country, id, { name });
     
     if (result.success) {
@@ -76,7 +102,8 @@ export const getCountryByName = async(req,res)=>{
     const { name } = req.params;
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-    console.log(nameCapitalize);
+
+
     const result = await getModelByParameterOne(Country,"name" ,nameCapitalize);
     if (result.success) {
         res.status(result.status).json(result.model);

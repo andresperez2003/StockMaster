@@ -51,7 +51,7 @@ export const createProduct =  async(req,res)=> {
         return res.status(400).json({ message: 'Cannot create a duplicate product' });
     }
 
-    const result = await createModel(Product, { name, price_sale, description, price_unit, photo, status,discount, id_category, id_company });
+    const result = await createModel(Product, { nameCapitalize, price_sale, description, price_unit, photo, status,discount, id_category, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'Product created' });
     } else {
@@ -80,11 +80,24 @@ export const updateProduct = async(req,res)=>{
         }
     });
 
+    const nameLower = productSelected.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    if (nameCapitalize != productSelected.name) {
+        const existingModule = await Product.findOne({ where: { name: nameCapitalize } });
+        if(existingModule) return res.status(400).json({ message: 'Cannot use a duplicate product name' });
+    }
+
+
     if(!productFound) return res.status(404).json({message:"Product not found"})
 
 
     if(products.success){
-        if (!name) name = productSelected.name
+        if (!name){
+            name = productSelected.name
+        }else{
+            name = nameCapitalize
+        }
         if (!price_sale) price_sale = productSelected.price_sale
         if (!price_unit) price_unit = productSelected.price_unit
         if (!description) description = productSelected.description

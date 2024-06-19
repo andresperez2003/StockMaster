@@ -43,6 +43,16 @@ export const createSale =  async(req,res)=> {
 
     if( !id_product || !quantity || !id_bill || !id_campus ) return res.status(400).json({message:"Fill all fields"})
 
+
+
+    const existingStatusBill = await statusBill.findOne({ where: { id_product: id_product, id_bill:id_bill, id_campus:id_campus } });
+    if(existingStatusBill){
+        let new_quantity = existingStatusBill.quantity + quantity
+        let update_quantity = await updateModel(Sale, id, {  new_quantity });
+        res.status(update_quantity.status).json({ message: 'Sale updated' });
+    }
+       
+
     const result = await createModel(Sale, {  id_product, quantity, id_bill, id_campus });
     if (result.success) {
 
@@ -84,9 +94,13 @@ export const updateSale = async(req,res)=>{
     }else{
         res.status(sales.status).json({ message: sales.message, error:sales.error });
     }
-
+    //Si es administrador
     const result = await updateModel(Sale, id, {  id_product, quantity, id_bill, id_campus });
     
+    //Si es vendedor
+    //const result = await updateModel(Sale, id, {  id_product, quantity});
+
+
     if (result.success) {
         res.status(result.status).json({ message: 'Sale updated' });
     } else {

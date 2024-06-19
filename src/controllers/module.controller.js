@@ -37,7 +37,16 @@ export const createModule =  async(req,res)=> {
 
     if(!name || !description) return res.status(400).json({message:"Fill all fields"})
 
-    const result = await createModel(Module, { name,description });
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const existingModule = await Module.findOne({ where: { name: nameCapitalize } });
+    if (existingModule) {
+        return res.status(400).json({ message: 'Cannot use a duplicate module name' });
+    }
+
+
+    const result = await createModel(Module, { nameCapitalize,description });
     if (result.success) {
         res.status(result.status).json({ message: 'Module created' });
     } else {
@@ -53,10 +62,24 @@ export const updateModule = async(req,res)=>{
     const { id } = req.params;
     let { name,description } = req.body;
 
-    const operation = await getModelById(Module,id)
-    if(!name) name = operation.model.name
-    if(!description) description = operation.model.description
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const module = await getModelById(Module,id)
+
+    if(!name){
+        name = module.model.name
+    }else{
+        name = nameCapitalize
+    }
+    if(!description) description = module.model.description
+
+
+    if (nameCapitalize != module.name) {
+        const existingModule = await Module.findOne({ where: { name: nameCapitalize } });
+        if(existingModule) return res.status(400).json({ message: 'Cannot create a duplicate module' });
+    }
 
     const result = await updateModel(Module, id, { name, description });
     

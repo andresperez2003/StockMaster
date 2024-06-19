@@ -44,7 +44,7 @@ export const createPart =  async(req,res)=> {
         return res.status(400).json({ message: 'Cannot create a duplicate part' });
     }
 
-    const result = await createModel(Part, { name, price_sale, price_unit, photo, id_company });
+    const result = await createModel(Part, { nameCapitalize, price_sale, price_unit, photo, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'Part created' });
     } else {
@@ -72,12 +72,24 @@ export const updatePart = async(req,res)=>{
         }
     });
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    if (nameCapitalize != partSelected.name) {
+        const existingPart = await Part.findOne({ where: { name: nameCapitalize } });
+        if(existingPart) return res.status(400).json({ message: 'Cannot use a duplicate part name' });
+    }
+
     if(!partFound) return res.status(404).json({message:"Part not found"})
     
 
 
     if(parts.success){
-        if (!name || name=='') name = partSelected.name
+        if (!name || name==''){
+            name = partSelected.name
+        }else{
+            name = nameCapitalize
+        }
         if (!quantity) quantity = partSelected.quantity
         if (!price) price = partSelected.price
         if (!photo || photo=='') photo = partSelected.photo

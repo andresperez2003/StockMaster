@@ -80,6 +80,11 @@ export const updatePermiss = async(req,res)=>{
         }
     });
 
+    if (id_operation != permissSelected.id_operation  || id_module != permissSelected.id_module) {
+        const existingPermiss = await Module.findOne({where: { id_module: id_module, id_operation: id_operation  }});
+        if(existingPermiss) return res.status(400).json({ message: 'Cannot add a duplicate permiss' });
+    }
+
     if(!permissFound) return res.status(404).json({message:"Permiss not found"})
 
 

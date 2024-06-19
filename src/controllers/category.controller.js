@@ -1,6 +1,6 @@
 
 import { Category } from '../models/category.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
+import {createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
 
 
 
@@ -33,7 +33,7 @@ export const getCategoryById = async(req,res)=>{
     });
     
     if(categoryFound) return res.status(result.status).json(categorySelected);
-    if(!categoryFound) return res.status(404).json({ message: 'Rol not found', error: result.error });
+    if(!categoryFound) return res.status(404).json({ message: 'Category not found', error: result.error });
 }
 
 
@@ -44,7 +44,19 @@ export const createCategory =  async(req,res)=> {
 
     if(!name) return res.status(400).json({message:"Fill all fields"})
 
-    const result = await createModel(Category, { name, description, id_company });
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+
+    const existingCategoria = await Category.findOne({ where: { name: nameCapitalize } });
+    if (existingCategoria) {
+        return res.status(400).json({ message: 'Cannot create a duplicate category' });
+    }
+    
+        const result = await createModel(Category, { nameCapitalize, description, id_company });
+
+
+
     if (result.success) {
         res.status(result.status).json({ message: 'Category created' });
     } else {
@@ -60,6 +72,9 @@ export const updateCategory = async(req,res)=>{
     const { company, id } = req.params;
     let { name, description,id_company } = req.body;
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
     const categories =  await getModelByParameterMany(Category, "id_company", company);
 
     let categorySelected= null
@@ -72,9 +87,20 @@ export const updateCategory = async(req,res)=>{
         }
     });
 
+
+    
+    if (nameCapitalize != categorySelected.name) {
+        const existingCategoria = await Category.findOne({ where: { name: nameCapitalize } });
+        if(existingCategoria) return res.status(400).json({ message: 'Cannot use a duplicate category name' });
+    }
+
     if(!categoryFound) return res.status(404).json({message:"Category not found"})
 
-    if (!name) name = categorySelected.name
+    if (!name){
+        name = categorySelected.name
+    }else{
+        name = nameCapitalize
+    }
     if (!description) description = categorySelected.description
     if (!id_company) id_company = categorySelected.id_company
 

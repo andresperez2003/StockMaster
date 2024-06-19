@@ -64,6 +64,13 @@ export const createUser =  async(req,res)=> {
     let {password} = req.body;
     if(!name) return res.status(400).json({message:"Fill all fields"})
     
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const lastnameLower = lastname.toLowerCase();
+    const lastnameCapitalize = lastnameLower.charAt(0).toUpperCase() + lastnameLower.slice(1);
+
+
     const existingUser = await User.findOne({ where: { identification: identification } });
     const existingEmail = await User.findOne({ where: { email: email } });
     if (existingUser || existingEmail) {
@@ -73,7 +80,7 @@ export const createUser =  async(req,res)=> {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     password = hashedPassword
 
-    const result = await createModel(User, { identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_campus });
+    const result = await createModel(User, { identification, nameCapitalize, lastnameCapitalize, username, password, status, photo, email, phone, id_rol, id_campus });
     if (result.success) {
         res.status(result.status).json({ message: 'User created' });
     } else {
@@ -101,11 +108,25 @@ export const updateUser = async (req, res) => {
         }
     });
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const lastnameLower = lastname.toLowerCase();
+    const lastnameCapitalize = lastnameLower.charAt(0).toUpperCase() + lastnameLower.slice(1);
+
     if(userFound) return res.status(404).json({message:"User not found"})
     if (users.success) {
         // Update the variables only if they are not provided or empty
-        if (!name || name == '') name = userSelected.name;
-        if (!lastname || lastname == '') lastname = userSelected.lastname;
+        if (!name || name == ''){
+            name = userSelected.name;
+        } else{
+            name = nameCapitalize
+        }
+        if (!lastname || lastname == ''){
+            lastname = userSelected.lastname;
+        }else{
+            lastname = lastnameCapitalize
+        }
         if (!username || username == '') username = userSelected.username;
         if (!password || password == '') password = userSelected.password; 
         if (status ==undefined) status = userSelected.status;

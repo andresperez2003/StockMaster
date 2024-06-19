@@ -32,7 +32,15 @@ export const getDepartmentById = async(req,res)=>{
 //Parametros: name, id_country
 export const createDepartment =  async(req,res)=> {
     const { name, id_country } = req.body;
-    const result = await createModel(Department, { name, id_country });
+
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+    const existingDepartment = await Department.findOne({ where: { name: nameCapitalize } });
+    if (existingDepartment) {
+        return res.status(400).json({ message: 'Cannot create a duplicate department' });
+    }
+
+    const result = await createModel(Department, { nameCapitalize, id_country });
     if (result.success) {
         res.status(result.status).json({ message: 'Department created' });
     } else {
@@ -47,6 +55,23 @@ export const createDepartment =  async(req,res)=> {
 export const updateDepartment = async(req,res)=>{
         const { id } = req.params;
     const { name, id_country } = req.body;
+
+    const department = await getModelById(Department,id)
+
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    if (nameCapitalize != department.name) {
+        const existingDepartment = await Department.findOne({ where: { name: nameCapitalize } });
+        if(existingDepartment) return res.status(400).json({ message: 'Cannot use a duplicate department name' });
+    }
+
+    if(!name){
+        name = department.model.name
+    }else{
+        name = nameCapitalize
+    }
+
     const result = await updateModel(Department, id, { name, id_country });
     
     if (result.success) {

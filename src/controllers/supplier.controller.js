@@ -39,12 +39,16 @@ export const createSupplier =  async(req,res)=> {
     if(!name  || !phone || !name_seller || !id_company) return res.status(400).json({message:"Fill all fields"})
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-    const existingSupplier = await Supplier.findOne({ where: { name: nameCapitalize } });
+
+    const nameSellerLower = name_seller.toLowerCase();
+    const nameSellerCapitalize = nameSellerLower.charAt(0).toUpperCase() + nameSellerLower.slice(1);
+
+    const existingSupplier = await Supplier.findOne({ where: { name: nameCapitalize, id_company:id_company, name_seller:name_seller } });
     if (existingSupplier) {
         return res.status(400).json({ message: 'Cannot create a duplicate supplier' });
     }
 
-    const result = await createModel(Supplier, { name, phone, name_seller, id_company });
+    const result = await createModel(Supplier, { nameCapitalize, phone, nameSellerCapitalize, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'Supplier created' });
     } else {
@@ -72,14 +76,26 @@ export const updateSupplier = async(req,res)=>{
         }
     });
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const nameSellerLower = name_seller.toLowerCase();
+    const nameSellerCapitalize = nameSellerLower.charAt(0).toUpperCase() + nameSellerLower.slice(1);
+
+    if (nameCapitalize != supplierSelected.name) {
+        const existingSupplier = await Supplier.findOne({ where: { name: nameCapitalize } });
+        if(existingSupplier) return res.status(400).json({ message: 'Cannot use a duplicate supplier name' });
+    }
+
+
     if(!supplierFound) return res.status(404).json({message:"Supplier not found"})
     
 
 
     if(suppliers.success){
-        if (!name) name = supplierSelected.name
+        if (!name) {name = supplierSelected.name}else{name = nameCapitalize}
         if (!phone) phone = supplierSelected.phone
-        if (!name_seller) name_seller = supplierSelected.name_seller
+        if (!name_seller){name_seller = supplierSelected.name_seller}else{name_seller = nameSellerCapitalize}
         if (!photo) photo = supplierSelected.photo
         if (!id_company) id_company = supplierSelected.id_company
 

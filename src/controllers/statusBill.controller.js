@@ -48,7 +48,16 @@ export const createStatusBill =  async(req,res)=> {
     console.log(id_company);
     if(!name || !id_company) return res.status(400).json({message:"Fill all fields"})
 
-    const result = await createModel(statusBill, { name, id_company });
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const existingStatusBill = await statusBill.findOne({ where: { name: nameCapitalize } });
+    if (existingStatusBill) {
+        return res.status(400).json({ message: 'Cannot use a duplicate statusBill name' });
+    }
+
+
+    const result = await createModel(statusBill, { nameCapitalize, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'StatusBill created' });
     } else {
@@ -77,10 +86,22 @@ export const updateStatusBill = async(req,res)=>{
         }
     });
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    if (nameCapitalize != statusBillSelected.name) {
+        const existingStatusBill = await statusBill.findOne({ where: { name: nameCapitalize } });
+        if(existingStatusBill) return res.status(400).json({ message: 'Cannot use a duplicate statusBill name' });
+    }
+
     if(!statusBillFound) return res.status(404).json({message:"StatusBill not found"})
 
     if(statusBills.success){
-        if (!name) name = statusBillSelected.name
+        if (!name){
+            name = statusBillSelected.name
+        }else{
+            name = nameCapitalize
+        }
         if (!id_company) id_company = statusBillSelected.id_company
     }else{
         res.status(statusBills.status).json({ message: statusBills.message, error:statusBills.error });

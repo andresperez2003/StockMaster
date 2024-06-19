@@ -61,6 +61,19 @@ export const createCampus =  async(req,res)=> {
 
     if(!name || !address || !phone || !id_city || !status  || !id_company) return res.status(400).json({message:"Fill all fields"})
  
+
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const addressLower = name.toLowerCase();
+    const addressCapitalize = addressLower.charAt(0).toUpperCase() + addressLower.slice(1);
+
+    
+    const existingCampus = await Campus.findOne({ where: { name: nameCapitalize, address:addressCapitalize } });
+    if (existingCampus) {
+        return res.status(400).json({ message: 'Cannot create a duplicate campus' });
+    }
+
     const result = await createModel(Campus, { name, address, phone, id_city,status,main_campus, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'Campus created' });
@@ -87,11 +100,19 @@ export const updateCampus = async(req,res)=>{
         }
     }
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const addressLower = name.toLowerCase();
+    const addressCapitalize = addressLower.charAt(0).toUpperCase() + addressLower.slice(1);
+
+    
+
     if(campusFound) return res.status(404).json({message:"Campus not found"})
 
     if(campus.success){
-        if (!name) name = campusSelected.name
-        if (!address) address = campusSelected.address
+        if (!name){name = campusSelected.name}else{ name = nameCapitalize}
+        if (!address){address = campusSelected.address}else{ address = addressCapitalize}
         if (!phone) phone = campusSelected.phone
         if (!id_city) id_city  = campusSelected.id_city
         if (status == undefined) status = campusSelected.status

@@ -31,7 +31,17 @@ export const getCityById = async(req,res)=>{
 //Parametros: name, id_department
 export const createCity =  async(req,res)=> {
     const { name, id_department, postal_code } = req.body;
-    const result = await createModel(City, { name, id_department, postal_code });
+
+
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+    
+    const existingCity = await City.findOne({ where: { name: nameCapitalize } });
+    if (existingCity) {
+        return res.status(400).json({ message: 'Cannot create a duplicate city' });
+    }
+
+    const result = await createModel(City, { nameCapitalize, id_department, postal_code });
     if (result.success) {
         res.status(result.status).json({ message: 'City created' });
     } else {
@@ -44,8 +54,25 @@ export const createCity =  async(req,res)=> {
 //Metodo que actualiza una ciudad
 //Parametros: name, id_department
 export const updateCity = async(req,res)=>{
-        const { id } = req.params;
+    const { id } = req.params;
     const { name, id_department } = req.body;
+
+    const city = await getModelById(City,id)
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    if (nameCapitalize != city.name) {
+        const existingCity = await City.findOne({ where: { name: nameCapitalize } });
+        if(existingCity) return res.status(400).json({ message: 'Cannot use a duplicate city name' });
+    }
+
+
+    if(!name){
+        name = city.model.name
+    }else{
+        name = nameCapitalize
+    }
+    
     const result = await updateModel(City, id, { name, id_department });
     
     if (result.success) {

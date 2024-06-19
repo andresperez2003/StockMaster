@@ -37,7 +37,16 @@ export const createOperation =  async(req,res)=> {
 
     if(!name) return res.status(400).json({message:"Fill all fields"})
 
-    const result = await createModel(Operation, { name });
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const existingOperation = await Operation.findOne({ where: { name: nameCapitalize } });
+    if (existingOperation) {
+        return res.status(400).json({ message: 'Cannot create a duplicate operation' });
+    }
+
+
+    const result = await createModel(Operation, { nameCapitalize });
     if (result.success) {
         res.status(result.status).json({ message: 'Operation created' });
     } else {
@@ -53,8 +62,23 @@ export const updateOperation = async(req,res)=>{
     const { id } = req.params;
     const { name } = req.body;
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
     const operation = await getModelById(Operation,id)
-    if(!name) name = operation.model.name
+    
+    if(!name){
+        name = operation.model.name
+    }else{
+        name = nameCapitalize
+    }
+
+
+
+    if (nameCapitalize != operation.name) {
+        const existingOperation = await Operation.findOne({ where: { name: nameCapitalize } });
+        if(existingOperation) return res.status(400).json({ message: 'Cannot use a duplicate operation name' });
+    }
 
     const result = await updateModel(Operation, id, { name });
     

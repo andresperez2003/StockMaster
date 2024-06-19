@@ -40,6 +40,10 @@ export const createBill =  async(req,res)=> {
     console.log(id, date_bill, id_campus, status, id_user, id_client );
     if( !id || !date_bill || !id_campus || !status || !id_user || !id_client ) return res.status(400).json({message:"Fill all fields"})
 
+    const existingBill = await Bill.findOne({ where: { date_bill: date_bill, id_campus:id_campus, id_user:id_user,id_client:id_client  } });
+    if (existingBill) {
+        return res.status(400).json({ message: 'Cannot create a duplicate bill' });
+    }
     const result = await createModel(Bill, {  id, date_bill, id_campus, status, id_user, id_client});
     if (result.success) {
         res.status(result.status).json({ message: 'Bill created' });

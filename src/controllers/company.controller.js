@@ -32,7 +32,20 @@ export const getCompanyById = async(req,res)=>{
 //Parametros: nit, name, id_masteruser
 export const createCompany =  async(req,res)=> {
     const { nit, name, photo, address, phone, status, id_city } = req.body;
-    const result = await createModel(Company, { nit, name, photo, address, phone, status, id_city });
+
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+
+    const existingCompany = await Company.findOne({ where: { nit: nit } });
+    if (existingCompany) {
+        return res.status(400).json({ message: 'Cannot create a duplicate company' });
+    }
+
+
+    const result = await createModel(Company, { nit, nameCapitalize, photo, address, phone, status, id_city });
+
+
+
     if (result.success) {
         res.status(result.status).json({ message: 'Company created' });
     } else {
@@ -49,16 +62,28 @@ export const updateCompany = async(req,res)=>{
     let { name, photo,phone, status, id_city } = req.body;
 
 
+    const nameLower = name.toLowerCase();
+    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+    
     const company = await getModelByParameterOne(Company,"nit", nit) 
-    console.log(company.model.name);
 
-    if(!name) name =company.model.name
+    if(!name){
+        name =company.model.name
+    }else{
+        name = nameCapitalize
+    }
     if(!photo) photo =company.model.photo
     if(!phone) phone =company.model.phone
     if(status==undefined) status =company.model.status
     if(!id_city) id_city =company.model.id_city
 
-    console.log(status);
+
+    if (name != company.name) {
+        const existingCompany = await Company.findOne({ where: { name: name } });
+        if(existingCompany) return res.status(400).json({ message: 'Cannot use a duplicate company name' });
+    }
+
+
     const result = await updateModel(Company, nit, { name, photo, phone, status, id_city },namePrimaryKey);
     
     if (result.success) {
