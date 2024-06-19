@@ -49,7 +49,7 @@ export const createSale =  async(req,res)=> {
     if(existingStatusBill){
         let new_quantity = existingStatusBill.quantity + quantity
         let update_quantity = await updateModel(Sale, id, {  new_quantity });
-        res.status(update_quantity.status).json({ message: 'Sale updated' });
+        return res.status(update_quantity.status).json({ message: 'Sale updated' });
     }
        
 

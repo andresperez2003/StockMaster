@@ -37,9 +37,11 @@ export const createPartXCampus =  async(req,res)=> {
     if( !id_part || !id_campus) return res.status(400).json({message:"Fill all fields"})
     
 
-    const existingProductXCampus = await PartXCampus.findOne({ where: { id_part: id_part, id_campus: id_campus  } });
-    if (existingProductXCampus) {
-        return res.status(400).json({ message: 'Cannot add a duplicated partxcampus' });
+    const existingPartXCampus = await PartXCampus.findOne({ where: { id_part: id_part, id_campus: id_campus  } });
+    if (existingPartXCampus) {
+        let new_quantity = existingPartXCampus.quantity_available + quantity_available
+        let update_quantity = await updateModel(PartXCampus, id, {  quantity_available:new_quantity });
+        return res.status(update_quantity.status).json({ message: 'PartXCampus updated' });
     }
 
     const result = await createModel(PartXCampus, { id_campus, id_part,quantity_available });
@@ -68,7 +70,14 @@ export const updatePartXCampus = async(req,res)=>{
         res.status(partXcampus.status).json({ message: partXcampus.message, error:partXcampus.error });
     }
 
-    const result = await updateModel(PartXCampus, id, { id_campus, id_part,quantity_available });
+    const existingPartXCampus = await PartXCampus.findOne({ where: { id_part: id_part, id_campus: id_campus  } });
+    if (existingPartXCampus) {
+        let new_quantity = existingPartXCampus.quantity_available + quantity_available
+        let update_quantity = await updateModel(PartXCampus, id, {  quantity_available:new_quantity });
+        return res.status(update_quantity.status).json({ message: 'PartXCampus updated' });
+    }
+
+    const result = await updateModel(PartXCampus, id, { id_campus, id_part, quantity_available });
     
     if (result.success) {
         res.status(result.status).json({ message: 'PartXCampus updated' });

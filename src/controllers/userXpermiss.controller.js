@@ -90,6 +90,13 @@ export const updateUserXPermiss = async(req,res)=>{
         res.status(userxpermiss.status).json({ message: userxpermiss.message, error:userxpermiss.error });
     }
 
+    if(id_user != userXpermissSelected.id_user || id_permiss != userXpermissSelected.id_permiss || id_company != userXpermissSelected.id_company){
+        const existingUserXPermiss = await UserXPermiss.findOne({ where: { id_user: id_user, id_permiss: id_permiss, id_company:id_company  } });
+        if (existingUserXPermiss) {
+            return res.status(400).json({ message: 'Cannot add a duplicated userxpermiss' });
+        }
+    }
+
     const result = await updateModel(UserXPermiss, id, { id_permiss, id_user, id_company });
     
     if (result.success) {

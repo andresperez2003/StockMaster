@@ -79,6 +79,13 @@ export const updateModuleXCompany = async(req,res)=>{
         }
     });
 
+    if(id_module != moduleXCompanySelected.id_module || id_company != moduleXCompanySelected.id_company){
+    const existingModuleXCompany = await ModuleXCompany.findOne({ where: { id_module: id_module, id_company: id_company  } });
+    if (existingModuleXCompany) {
+        return res.status(400).json({ message: 'Cannot add a duplicated modulexcampus' });
+    }
+    }
+
     if(!moduleXCompanyFound) return res.status(404).json({message:"Category not found"})
 
     if(modulexcampus.success){

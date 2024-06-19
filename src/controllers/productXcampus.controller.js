@@ -38,7 +38,9 @@ export const createProductXCampus =  async(req,res)=> {
 
     const existingProductXCampus = await ProductXCampus.findOne({ where: { id_product: id_product, id_campus: id_campus  } });
     if (existingProductXCampus) {
-        return res.status(400).json({ message: 'Cannot add a duplicated productxcampus' });
+        let new_quantity = existingProductXCampus.quantity_available + quantity_available
+        let update_quantity = await updateModel(ProductXCampus, id, {  quantity_available:new_quantity });
+        return res.status(update_quantity.status).json({ message: 'ProductXCampus updated' });
     }
 
     const result = await createModel(ProductXCampus, { id_campus, id_product, quantity_available });
@@ -65,6 +67,13 @@ export const updateProductXCampus = async(req,res)=>{
         if (!quantity_available) quantity_available = productXcampus.model.quantity_available
     }else{
         res.status(productXcampus.status).json({ message: productXcampus.message, error:productXcampus.error });
+    }
+    
+    const existingProductXCampus = await ProductXCampus.findOne({ where: { id_product: id_product, id_campus: id_campus  } });
+    if (existingProductXCampus) {
+        let new_quantity = existingProductXCampus.quantity_available + quantity_available
+        let update_quantity = await updateModel(ProductXCampus, id, {  quantity_available:new_quantity });
+        return res.status(update_quantity.status).json({ message: 'ProductXCampus updated' });
     }
 
     const result = await updateModel(ProductXCampus, id, { id_campus, id_product, quantity_available });

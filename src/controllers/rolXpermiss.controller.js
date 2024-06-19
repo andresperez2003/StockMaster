@@ -104,6 +104,13 @@ export const updateRolXPermiss = async(req,res)=>{
         res.status(rolxpermiss.status).json({ message: rolxpermiss.message, error:rolxpermiss.error });
     }
 
+    if(id_rol != rolxpermissSelected.id_rol || id_permiss != rolxpermissSelected.id_permiss || id_company != rolxpermissSelected.id_company){
+        const existingRolXPermiss = await RolXPermiss.findOne({ where: { id_rol: id_rol, id_permiss: id_permiss, id_company: id_company  } });
+        if (existingRolXPermiss) {
+            return res.status(400).json({ message: 'Cannot add a duplicated rolxpermiss' });
+        }
+    }
+
     const result = await updateModel(RolXPermiss, id, { id_rol, id_permiss, id_company });
     
     if (result.success) {

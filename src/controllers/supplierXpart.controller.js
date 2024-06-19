@@ -88,6 +88,13 @@ export const updateSupplierXPart = async(req,res)=>{
         res.status(supplierxparts.status).json({ message: supplierxparts.message, error:supplierxparts.error });
     }
 
+    if(id_part != supplierxpartSelected.id_part || id_supplier != supplierxpartSelected.id_supplier || id_company != supplierxpartSelected.id_company){
+        const existingSupplierXPart = await SupplierXPart.findOne({ where: { id_part: id_part, id_supplier: id_supplier, id_company:id_company  } });
+        if (existingSupplierXPart) {
+            return res.status(400).json({ message: 'Cannot add a duplicated supplier to a part' });
+        }
+    }
+
     const result = await updateModel(SupplierXPart, id, { id_part, id_supplier, id_company });
     
     if (result.success) {

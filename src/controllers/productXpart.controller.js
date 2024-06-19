@@ -90,6 +90,14 @@ export const updateProductXPart = async(req,res)=>{
         res.status(productxparts.status).json({ message: productxparts.message, error:productxparts.error });
     }
 
+    if(id_product != productxpartSelected.id_product || id_part != productxpartSelected.id_part || id_company != productxpartSelected.id_company){
+        const existingProductXPart = await ProductXPart.findOne({ where: { id_product: id_product, id_part: id_part, id_company:id_company  } });
+        if (existingProductXPart) {
+            return res.status(400).json({ message: 'Cannot add a duplicated part to a product' });
+        }  
+    }
+
+
     const result = await updateModel(ProductXPart, id, { id_product, id_part,id_company });
     
     if (result.success) {
