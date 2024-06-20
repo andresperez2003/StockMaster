@@ -40,7 +40,8 @@ export const createPartXCampus =  async(req,res)=> {
     const existingPartXCampus = await PartXCampus.findOne({ where: { id_part: id_part, id_campus: id_campus  } });
     if (existingPartXCampus) {
         let new_quantity = existingPartXCampus.quantity_available + quantity_available
-        let update_quantity = await updateModel(PartXCampus, id, {  quantity_available:new_quantity });
+        let update_quantity = await updateModel(PartXCampus, existingPartXCampus.id, {  quantity_available:new_quantity });
+        await deleteModel(PartXCampus, id)
         return res.status(update_quantity.status).json({ message: 'PartXCampus updated' });
     }
 
@@ -63,27 +64,30 @@ export const updatePartXCampus = async(req,res)=>{
     const partXcampus =  await getModelById(PartXCampus, id);
 
     if(partXcampus.success){
-        if (!id_part) id_part = permiss.model.id_part
-        if (!id_campus) id_campus = permiss.model.id_campus
-        if (!quantity_available) quantity_available = permiss.model.quantity_available
+        if (!id_part) id_part = partXcampus.model.id_part
+        if (!id_campus) id_campus = partXcampus.model.id_campus
+        if (!quantity_available) quantity_available = partXcampus.model.quantity_available
     }else{
         res.status(partXcampus.status).json({ message: partXcampus.message, error:partXcampus.error });
     }
 
     const existingPartXCampus = await PartXCampus.findOne({ where: { id_part: id_part, id_campus: id_campus  } });
-    if (existingPartXCampus) {
+    
+    if (existingPartXCampus && existingPartXCampus.id != id) {
         let new_quantity = existingPartXCampus.quantity_available + quantity_available
-        let update_quantity = await updateModel(PartXCampus, id, {  quantity_available:new_quantity });
+        const update_quantity = await updateModel(PartXCampus, existingPartXCampus.id, {  quantity_available:new_quantity });
+        await deleteModel(PartXCampus, id)
         return res.status(update_quantity.status).json({ message: 'PartXCampus updated' });
     }
 
     const result = await updateModel(PartXCampus, id, { id_campus, id_part, quantity_available });
-    
+
     if (result.success) {
-        res.status(result.status).json({ message: 'PartXCampus updated' });
+        return res.status(result.status).json({ message: 'PartXCampus updated' });
     } else {
-        res.status(result.status).json({ message: 'Something went wrong', error: result.error });
+        return res.status(result.status).json({ message: 'Something went wrong', error: result.error });
     }
+
 }
  
 

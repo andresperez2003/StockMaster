@@ -1,8 +1,9 @@
 
 import { Sale } from '../models/sale.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterManyWithJoin, getModelByParameterOne} from "./general.controller.js"
+import {getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterManyWithJoin, getModelByParameterOne, getModelByManyParameters} from "./general.controller.js"
 import { Product } from '../models/product.model.js';
 import { Category } from '../models/category.model.js';
+import { ProductXCampus } from '../models/productXcampus.model.js';
 
 
 //Metodo que devuelve todas las ventas
@@ -45,19 +46,22 @@ export const createSale =  async(req,res)=> {
 
 
 
-    const existingStatusBill = await statusBill.findOne({ where: { id_product: id_product, id_bill:id_bill, id_campus:id_campus } });
+    const existingStatusBill = await Sale.findOne({ where: { id_product: id_product, id_bill:id_bill, id_campus:id_campus } });
     if(existingStatusBill){
         let new_quantity = existingStatusBill.quantity + quantity
-        let update_quantity = await updateModel(Sale, id, {  new_quantity });
-        return res.status(update_quantity.status).json({ message: 'Sale updated' });
+        let update_quantity = await updateModel(Sale, existingStatusBill.id, {  quantity_available:new_quantity });
+        return res.status(update_quantity.status).json({ message: 'Sale added' });
     }
        
+    const productxcampus = await getModelByManyParameters(ProductXCampus, {"id_product":id_product, "id_campus":id_campus})
+    let substraction = productxcampus.model.quantity_available - quantity
+
+    if(substraction < 0) return res.status(400).json({message:"Not enough products"})
 
     const result = await createModel(Sale, {  id_product, quantity, id_bill, id_campus });
     if (result.success) {
-
-        res.status(result.status).json({ message: 'Sale created' });
-
+        await updateModel(ProductXCampus, productxcampus.model.id, { quantity_available: substraction });
+        return res.status(result.status).json({ message: 'Sale created' });
     } else {
         res.status(result.status).json({ message: result.message, error: result.error });
     }

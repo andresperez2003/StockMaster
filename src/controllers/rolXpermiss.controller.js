@@ -13,13 +13,13 @@ import { Operation } from '../models/operation.model.js';
 //Metodo que devuelve todos las partes de un producto
 export const getRolXPermiss = async(req,res)=> {
         const {company} = req.params
-        const result = await getModelByParameterManyWithJoin(RolXPermiss,"id_company",company,["id"],
+        const result = await getModelByParameterManyWithJoin(RolXPermiss,"id_company",company,[/* "id" */],
             [
-                {model: Rol, required:true, attributes:["name"]},
+         /*        {model: Rol, required:true, attributes:["name"]},
                 {model: Permiss, required:true, attributes:["id"], include:[
                     {model:Operation, required:true, attributes:["name"]},
                     {model:Module, required:true, attributes:["name"]}
-                ]}
+                ]} */
             ]);
         if (result.success) {
             res.status(result.status).json(result.model);
@@ -57,7 +57,7 @@ console.log(result.model);
 export const createRolXPermiss =  async(req,res)=> {
     const { id_rol, id_permiss, id_company } = req.body;
 
-    if( !id_rol || !id_permiss ||  id_company) return res.status(400).json({message:"Fill all fields"})
+    if( !id_rol || !id_permiss ||  !id_company) return res.status(400).json({message:"Fill all fields"})
     
 
     const existingRolXPermiss = await RolXPermiss.findOne({ where: { id_rol: id_rol, id_permiss: id_permiss, id_company: id_company  } });

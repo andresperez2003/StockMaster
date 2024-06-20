@@ -68,7 +68,7 @@ export const updateSupplierXCampus = async(req,res)=>{
     }
 
 
-    if(id_supplier != supplierXcampus.model.id_supplier || id_campus != supplierXcampus.model.id_campus){
+    if(id_supplier != supplierXcampus.id_supplier || id_campus != supplierXcampus.id_campus){
         const existingSupplierXCampus = await SupplierXCampus.findOne({ where: { id_supplier: id_supplier, id_campus: id_campus  } });
         if (existingSupplierXCampus) {
             return res.status(400).json({ message: 'Cannot add a duplicated supplierxcampus' });

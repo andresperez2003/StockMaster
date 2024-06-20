@@ -39,7 +39,7 @@ export const createProductXCampus =  async(req,res)=> {
     const existingProductXCampus = await ProductXCampus.findOne({ where: { id_product: id_product, id_campus: id_campus  } });
     if (existingProductXCampus) {
         let new_quantity = existingProductXCampus.quantity_available + quantity_available
-        let update_quantity = await updateModel(ProductXCampus, id, {  quantity_available:new_quantity });
+        let update_quantity = await updateModel(ProductXCampus, existingProductXCampus.id, {  quantity_available:new_quantity });
         return res.status(update_quantity.status).json({ message: 'ProductXCampus updated' });
     }
 
@@ -70,18 +70,22 @@ export const updateProductXCampus = async(req,res)=>{
     }
     
     const existingProductXCampus = await ProductXCampus.findOne({ where: { id_product: id_product, id_campus: id_campus  } });
-    if (existingProductXCampus) {
-        let new_quantity = existingProductXCampus.quantity_available + quantity_available
-        let update_quantity = await updateModel(ProductXCampus, id, {  quantity_available:new_quantity });
-        return res.status(update_quantity.status).json({ message: 'ProductXCampus updated' });
-    }
+    
+    if (existingProductXCampus && existingProductXCampus.id != id) {
+            
+            let new_quantity = existingProductXCampus.quantity_available + quantity_available
+            const update_quantity = await updateModel(ProductXCampus, existingProductXCampus.id, {  quantity_available:new_quantity });
+            await deleteModel(ProductXCampus, id)
+            return res.status(update_quantity.status).json({ message: 'ProductXCampus updated' });
+        }
+    
 
     const result = await updateModel(ProductXCampus, id, { id_campus, id_product, quantity_available });
     
     if (result.success) {
-        res.status(result.status).json({ message: 'ProductXCampus updated' });
+        return res.status(result.status).json({ message: 'ProductXCampus updated' });
     } else {
-        res.status(result.status).json({ message: 'Something went wrong', error: result.error });
+        return res.status(result.status).json({ message: 'Something went wrong', error: result.error });
     }
 }
  

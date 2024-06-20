@@ -9,9 +9,9 @@ import { Module } from '../models/module.model.js';
 //Metodo que devuelve todos las partes de un producto
 export const getPermiss = async(req,res)=> {
         const {company} = req.params
-        const result = await getModelByParameterManyWithJoin(Permiss,"id_company",company,["id"],[
-            {model:Operation, required:true, attributes:["name"]},
-            {model:Module, required:true, attributes:["name"]}
+        const result = await getModelByParameterManyWithJoin(Permiss,"id_company",company,[/* "id" */],[
+           /*  {model:Operation, required:true, attributes:["name"]},
+            {model:Module, required:true, attributes:["name"]} */
         ]);
         if (result.success) {
             res.status(result.status).json(result.model);
@@ -24,9 +24,9 @@ export const getPermiss = async(req,res)=> {
 //Parametros: id
 export const getPermissById = async(req,res)=>{
     const { company, id } = req.params;
-    const result = await getModelByParameterManyWithJoin(Permiss,"id_company", company,["id"],[
-        {model:Operation, required:true, attributes:["name"]},
-        {model:Module, required:true, attributes:["name"]}
+    const result = await getModelByParameterManyWithJoin(Permiss,"id_company", company,[/* "id" */],[
+       /*  {model:Operation, required:true, attributes:["name"]},
+        {model:Module, required:true, attributes:["name"]} */
     ]);
 
     for (const campusObj of result.model) {
@@ -42,17 +42,17 @@ export const getPermissById = async(req,res)=>{
 //Metodo que agrega una parte a un producto
 //Parametros: id_product, id_part, id_company
 export const createPermiss =  async(req,res)=> {
-    const { id_module, id_operation } = req.body;
+    const { id_module, id_operation, id_company } = req.body;
 
-    if( !id_module || !id_operation) return res.status(400).json({message:"Fill all fields"})
+    if( !id_module || !id_operation || id_company) return res.status(400).json({message:"Fill all fields"})
     
 
-    const existingPermiss = await Permiss.findOne({ where: { id_module: id_module, id_operation: id_operation  } });
+    const existingPermiss = await Permiss.findOne({ where: { id_module: id_module, id_operation: id_operation, id_company:id_company  } });
     if (existingPermiss) {
         return res.status(400).json({ message: 'Cannot add a duplicated permiss' });
     }
 
-    const result = await createModel(Permiss, { id_module, id_operation });
+    const result = await createModel(Permiss, { id_module, id_operation, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'Permiss added' });
     } else {
@@ -66,7 +66,7 @@ export const createPermiss =  async(req,res)=> {
 //Parametros: id, id_product, id_part, id_company
 export const updatePermiss = async(req,res)=>{
     const { company,id } = req.params;
-    let { id_operation, id_module } = req.body;
+    let { id_operation, id_module, id_company } = req.body;
 
     const permisses =  await getModelByParameterMany(Permiss, "id_company", company);
     //price unit
@@ -80,9 +80,11 @@ export const updatePermiss = async(req,res)=>{
         }
     });
 
-    if (id_operation != permissSelected.id_operation  || id_module != permissSelected.id_module) {
-        const existingPermiss = await Module.findOne({where: { id_module: id_module, id_operation: id_operation  }});
+
+    if(id_operation != permissSelected.id_operation || id_module != permissSelected.id_module || id_company != permissSelected.id_company){
+        const existingPermiss = await Permiss.findOne({where: { id_module: id_module, id_operation: id_operation, id_company:id_company  }});
         if(existingPermiss) return res.status(400).json({ message: 'Cannot add a duplicate permiss' });
+            
     }
 
     if(!permissFound) return res.status(404).json({message:"Permiss not found"})
@@ -91,11 +93,12 @@ export const updatePermiss = async(req,res)=>{
     if(permisses.success){
         if (!id_operation) id_operation = permissSelected.model.id_product
         if (!id_module) id_module = permissSelected.model.id_module
+        if (!id_company) id_company = permissSelected.model.id_company
     }else{
         res.status(permisses.status).json({ message: permisses.message, error:permisses.error });
     }
 
-    const result = await updateModel(Permiss, id, { id_operation, id_module });
+    const result = await updateModel(Permiss, id, { id_operation, id_module, id_company });
     
     if (result.success) {
         res.status(result.status).json({ message: 'Permiss updated' });

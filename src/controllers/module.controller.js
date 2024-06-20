@@ -33,10 +33,11 @@ export const getModuleById = async(req,res)=>{
 //Metodo que crea una nueva operacion
 //Parametros: name
 export const createModule =  async(req,res)=> {
-    const { name, description } = req.body;
+    let { name, description } = req.body;
 
-    if(!name || !description) return res.status(400).json({message:"Fill all fields"})
-
+    if(!name) return res.status(400).json({message:"Fill all fields"})
+    if(!description) description =""
+    
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
 

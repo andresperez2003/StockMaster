@@ -60,7 +60,7 @@ export const createOperation =  async(req,res)=> {
 //Parametros: name, description
 export const updateOperation = async(req,res)=>{
     const { id } = req.params;
-    const { name } = req.body;
+    let { name } = req.body;
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);

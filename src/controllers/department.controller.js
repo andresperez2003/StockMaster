@@ -35,7 +35,7 @@ export const createDepartment =  async(req,res)=> {
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-    const existingDepartment = await Department.findOne({ where: { name: nameCapitalize } });
+    const existingDepartment = await Department.findOne({ where: { name: nameCapitalize, id_country:id_country } });
     if (existingDepartment) {
         return res.status(400).json({ message: 'Cannot create a duplicate department' });
     }
@@ -61,8 +61,8 @@ export const updateDepartment = async(req,res)=>{
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
 
-    if (nameCapitalize != department.name) {
-        const existingDepartment = await Department.findOne({ where: { name: nameCapitalize } });
+    if (nameCapitalize != department.name || id_country != department.id_country) {
+        const existingDepartment = await Department.findOne({ where: { name: nameCapitalize, id_country:id_country } });
         if(existingDepartment) return res.status(400).json({ message: 'Cannot use a duplicate department name' });
     }
 
@@ -71,6 +71,12 @@ export const updateDepartment = async(req,res)=>{
     }else{
         name = nameCapitalize
     }
+    if(!id_country){
+        name = department.model.id_country
+    }else{
+        name = id_country
+    }
+    
 
     const result = await updateModel(Department, id, { name, id_country });
     

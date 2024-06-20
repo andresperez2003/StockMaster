@@ -56,6 +56,18 @@ export const getModelByParameterOne = async (Model, parameter, value) => {
     }
 };
 
+export const getModelByManyParameters = async (Model, parameters) => {
+    try {
+        const model = await Model.findOne({ where: parameters });
+        if (!model) {
+            return { success: false, error: 'Model not found', status:404 };
+        }
+        return { success: true, model, status:200 };
+    } catch (error) {
+        return { success: false, error: error.message, status:500,  message: 'Something went wrong'  };
+    }
+};
+
 export const getModelByParameterMany = async (Model, parameter, value) => {
     try {
         const model = await Model.findAll({ where: { [parameter]: value } });

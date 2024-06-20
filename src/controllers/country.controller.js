@@ -35,7 +35,7 @@ export const createCountry =  async(req,res)=> {
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-    const existingCountry = await City.findOne({ where: { name: nameCapitalize } });
+    const existingCountry = await Country.findOne({ where: { name: nameCapitalize } });
     if (existingCountry) {
         return res.status(400).json({ message: 'Cannot create a duplicate country' });
     }
@@ -62,7 +62,7 @@ export const updateCountry = async(req,res)=>{
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
 
     if (nameCapitalize != country.name) {
-        const existingOperation = await Operation.findOne({ where: { name: nameCapitalize } });
+        const existingOperation = await Country.findOne({ where: { name: nameCapitalize } });
         if(existingOperation) return res.status(400).json({ message: 'Cannot use a duplicate country name' });
     }
 
