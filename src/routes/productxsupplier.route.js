@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - ProductXSupplier   
  */
-router.get('/productXsupplier/:company',  getProductXSupplier)
+router.get('/productXsupplier/:campus',  getProductXSupplier)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/productXsupplier/:company',  getProductXSupplier)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.get('/productXsupplier/:company/:id',  getProductXSupplierById)
+router.get('/productXsupplier/:campus/:id',  getProductXSupplierById)
 
 
 
@@ -110,7 +110,7 @@ router.post('/productXsupplier',   createProductXSupplier)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.put('/productXsupplier/:company/:id',  updateProductXSupplier)
+router.put('/productXsupplier/:campus/:id',  updateProductXSupplier)
 
 
 /**
@@ -133,7 +133,7 @@ router.put('/productXsupplier/:company/:id',  updateProductXSupplier)
  *       404:
  *         description: Proveedor del producto no encontrado
  */
-router.delete('/productXsupplier/:company/:id',  deleteProductXSupplier)
+router.delete('/productXsupplier/:campus/:id',  deleteProductXSupplier)
 
 
 

@@ -71,7 +71,7 @@ export const createUser =  async(req,res)=> {
     const lastnameCapitalize = lastnameLower.charAt(0).toUpperCase() + lastnameLower.slice(1);
 
 
-    const existingUser = await User.findOne({ where: { identification: identification } });
+    const existingUser = await User.findOne({ where: { identification: identification, id_campus:id_campus } });
     const existingEmail = await User.findOne({ where: { email: email } });
     if (existingUser || existingEmail) {
         return res.status(400).json({ message: 'Cannot create a duplicate user' });

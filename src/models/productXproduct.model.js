@@ -3,13 +3,12 @@ import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la instancia de conexión a tu base de datos
 
 import {Product} from './product.model.js'
-import {Part} from './part.model.js'
 import { Company } from './company.model.js';
 
 
 
 // Define el modelo de la tabla PartXProduct
-const ProductXPart = sequelize.define('PartXProduct', {
+const ProductXProduct = sequelize.define('ProductXProduct', {
   id_product: {
     type: DataTypes.INTEGER,
     allowNull: false
@@ -23,14 +22,14 @@ const ProductXPart = sequelize.define('PartXProduct', {
     allowNull:false
   }
 }, {
-  tableName: 'productxpart', // Nombre de la tabla en la base de datos
+  tableName: 'productxproduct', // Nombre de la tabla en la base de datos
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
 
-ProductXPart.belongsTo(Product, { foreignKey: 'id_product' });
-ProductXPart.belongsTo(Part, { foreignKey: 'id_part' });
-ProductXPart.belongsTo(Company, { foreignKey: 'id_company' });
+ProductXProduct.belongsTo(Product, { foreignKey: 'id_product' });
+ProductXProduct.belongsTo(Product, { foreignKey: 'id_part' });
+ProductXProduct.belongsTo(Company, { foreignKey: 'id_company' });
 
 
 // Exporta el modelo PartXProduct
-export { ProductXPart };
+export { ProductXProduct };

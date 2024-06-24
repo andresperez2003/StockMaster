@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la instancia de conexión a tu base de datos
 import { Product } from './product.model.js';
 import {Supplier} from './supplier.model.js'
-import { Company } from './company.model.js';
+import { Campus } from './campus.model.js';
 
 // Define el modelo de la tabla ProductXSupplier
 const ProductXSupplier = sequelize.define('ProductXSupplier', {
@@ -15,8 +15,12 @@ const ProductXSupplier = sequelize.define('ProductXSupplier', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  id_company:{
+  id_campus:{
     type: DataTypes.STRING,
+    allowNull:false
+  },
+  dateContract:{
+    type: DataTypes.DATE,
     allowNull:false
   }
 }, {
@@ -26,7 +30,7 @@ const ProductXSupplier = sequelize.define('ProductXSupplier', {
 
 ProductXSupplier.belongsTo(Product, { foreignKey: 'id_product' });
 ProductXSupplier.belongsTo(Supplier, { foreignKey: 'id_supplier' });
-ProductXSupplier.belongsTo(Company, { foreignKey: 'id_company' });
+ProductXSupplier.belongsTo(Campus, { foreignKey: 'id_campus' });
 
 
 // Exporta el modelo ProductXSupplier

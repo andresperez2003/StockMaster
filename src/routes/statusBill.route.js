@@ -12,7 +12,7 @@ router.get('/statusBill/:company',  getStatusBill)
 router.get('/statusBill/:company/:id',  getStatusBillById)
 
 
-router.get('/statusBillByName/:company/:name',  getStatusBillByName)
+router.get('/statusBill/name/:company/:name',  getStatusBillByName)
 
 
 router.post('/statusBill',  createStatusBill)

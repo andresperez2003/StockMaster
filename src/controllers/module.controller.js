@@ -47,7 +47,7 @@ export const createModule =  async(req,res)=> {
     }
 
 
-    const result = await createModel(Module, { nameCapitalize,description });
+    const result = await createModel(Module, { name: nameCapitalize,description });
     if (result.success) {
         res.status(result.status).json({ message: 'Module created' });
     } else {

@@ -1,33 +1,24 @@
 // Importa Sequelize y la instancia de conexión a la base de datos
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la instancia de conexión a tu base de datos
+import { Company } from './company.model.js';
 
-// Define el modelo de la tabla Part
-const Part = sequelize.define('Part', {
+// Define el modelo de la tabla Bill
+const Unit = sequelize.define('unit', {
   name: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  price_sale: {
-    type: DataTypes.FLOAT,
-    allowNull: false
-  },
-  price_unit: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  photo: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  id_company: {
+  id_company:{
     type: DataTypes.STRING,
     allowNull: false
   }
 }, {
-  tableName: 'part', // Nombre de la tabla en la base de datos
+  tableName: 'unit', // Nombre de la tabla en la base de datos
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
 
-// Exporta el modelo Part
-export { Part };
+Unit.belongsTo(Company, { foreignKey: 'id_company' });
+
+// Exporta el modelo Bill
+export { Unit };

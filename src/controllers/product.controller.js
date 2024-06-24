@@ -41,17 +41,17 @@ export const getProductById = async(req,res)=>{
 //Metodo que crea un nuevo producto
 //Parametros:  name, price, quantity, description, photo, status,discount, id_category, id_company
 export const createProduct =  async(req,res)=> {
-    const { name, price_sale, price_unit, description, photo, status,discount, id_category, id_company } = req.body;
-    if(!name || !price_sale || !price_unit || !description || !photo || !discount || !id_category || !id_company) return res.status(400).json({message:"Fill all fields"})
+    const { name, price_sale, price_unit, description, photo, status,discount, id_category, id_company, id_unit, can_sell } = req.body;
+    if(!name || !price_sale || !price_unit || !description || !photo || !discount || !id_category || !id_company || !id_unit) return res.status(400).json({message:"Fill all fields"})
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-    const existingProduct = await Product.findOne({ where: { name: nameCapitalize } });
+    const existingProduct = await Product.findOne({ where: { name: nameCapitalize, id_company:id_company } });
     
     if (existingProduct) {
         return res.status(400).json({ message: 'Cannot create a duplicate product' });
     }
 
-    const result = await createModel(Product, { nameCapitalize, price_sale, description, price_unit, photo, status,discount, id_category, id_company });
+    const result = await createModel(Product, { nameCapitalize, price_sale, description, price_unit, photo, status,discount, id_category, id_company, id_unit, can_sell });
     if (result.success) {
         res.status(result.status).json({ message: 'Product created' });
     } else {
@@ -65,7 +65,7 @@ export const createProduct =  async(req,res)=> {
 //Parametros: id, name, price, quantity, description, photo, status,discount, id_category, id_company
 export const updateProduct = async(req,res)=>{
     const { company, id } = req.params;
-    let { name, price_unit, price_sale, description, photo, status,discount, id_category, id_company } = req.body;
+    let { name, price_unit, price_sale, description, photo, status,discount, id_category, id_company, id_unit, can_sell } = req.body;
 
     const products =  await getModelByParameterMany(Product, "id_company", company);
     //price unit
@@ -84,7 +84,7 @@ export const updateProduct = async(req,res)=>{
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
 
     if (nameCapitalize != productSelected.name) {
-        const existingModule = await Product.findOne({ where: { name: nameCapitalize } });
+        const existingModule = await Product.findOne({ where: { name: nameCapitalize, id_company:id_company } });
         if(existingModule) return res.status(400).json({ message: 'Cannot use a duplicate product name' });
     }
 
@@ -105,11 +105,16 @@ export const updateProduct = async(req,res)=>{
         if (!discount) discount = productSelected.discount
         if (!id_category) id_category = productSelected.id_category
         if (!id_company) id_company = productSelected.id_company
+        if (!id_unit) id_unit = productSelected.id_unit
+        if (status == undefined) status = productSelected.status
+        if (can_sell == undefined) can_sell = productSelected.can_sell
+        
+
     }else{
         res.status(products.status).json({ message: products.message, error:products.error });
     }
 
-    const result = await updateModel(Product, id, { name, price_sale, price_unit,description, photo, status,discount, id_category, id_company });
+    const result = await updateModel(Product, id, { name, price_sale, price_unit,description, photo, status,discount, id_category, id_company, id_unit, can_sell});
     
     if (result.success) {
         res.status(result.status).json({ message: 'Product updated' });

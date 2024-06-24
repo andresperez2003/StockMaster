@@ -83,7 +83,7 @@ export const updateSupplier = async(req,res)=>{
     const nameSellerCapitalize = nameSellerLower.charAt(0).toUpperCase() + nameSellerLower.slice(1);
 
     if (nameCapitalize != supplierSelected.name) {
-        const existingSupplier = await Supplier.findOne({ where: { name: nameCapitalize } });
+        const existingSupplier = await Supplier.findOne({ where: { name: nameCapitalize, id_company:id_company, name_seller:name_seller } });
         if(existingSupplier) return res.status(400).json({ message: 'Cannot use a duplicate supplier name' });
     }
 

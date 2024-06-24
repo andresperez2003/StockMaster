@@ -69,7 +69,7 @@ export const createCampus =  async(req,res)=> {
     const addressCapitalize = addressLower.charAt(0).toUpperCase() + addressLower.slice(1);
 
     
-    const existingCampus = await Campus.findOne({ where: { name: nameCapitalize, address:addressCapitalize } });
+    const existingCampus = await Campus.findOne({ where: { name: nameCapitalize, id_city:id_city, id_company:id_company } });
     if (existingCampus) {
         return res.status(400).json({ message: 'Cannot create a duplicate campus' });
     }

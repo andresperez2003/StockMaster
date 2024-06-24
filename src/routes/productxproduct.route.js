@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getProductXParts, getProductXPartById, createProductXPart, updateProductXPart, deleteProductXPart} from '../controllers/productXpart.controller.js'
+import {getProductXProduct, getProductXProductById, updateProductXProduct, createProductXProduct, deleteProductXProduct} from '../controllers/productXproduct.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - ProductXPart    
  */
-router.get('/productXparts/:company',  getProductXParts)
+router.get('/productXproduct/:company',  getProductXProduct)
 
 
 /**
@@ -39,7 +39,7 @@ router.get('/productXparts/:company',  getProductXParts)
  *       404:
  *         description: Parte del producto no encontrado
  */
-router.get('/productXparts/:company/:id',  getProductXPartById)
+router.get('/productXproduct/:company/:id',  getProductXProductById)
 
 
 
@@ -71,7 +71,7 @@ router.get('/productXparts/:company/:id',  getProductXPartById)
  *         description: Parte agregar al producto
 
  */
-router.post('/productXparts',  createProductXPart)
+router.post('/productXproduct',  createProductXProduct)
 
 
 /**
@@ -110,7 +110,7 @@ router.post('/productXparts',  createProductXPart)
  *       404:
  *         description: Parte del producto no encontrado
  */
-router.put('/productXparts/:company/:id',   updateProductXPart)
+router.put('/productXproduct/:company/:id',   updateProductXProduct)
 
 
 /**
@@ -133,7 +133,7 @@ router.put('/productXparts/:company/:id',   updateProductXPart)
  *       404:
  *         description: Parte del producto no encontrado
  */
-router.delete('/productXparts/:company/:id',  deleteProductXPart)
+router.delete('/productXproduct/:company/:id',  deleteProductXProduct)
 
 
 

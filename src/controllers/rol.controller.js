@@ -47,7 +47,7 @@ export const createRol =  async(req,res)=> {
     if(!name) return res.status(400).json({message:"Fill all fields"})
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-    const existingRol = await Rol.findOne({ where: { name: nameCapitalize } });
+    const existingRol = await Rol.findOne({ where: { name: nameCapitalize, id_company:id_company } });
     if (existingRol) {
         return res.status(400).json({ message: 'Cannot create a duplicate rol' });
     }
@@ -84,7 +84,7 @@ export const updateRol = async(req,res)=>{
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
 
     if (nameCapitalize != rolSelected.name) {
-        const existingRol = await Rol.findOne({ where: { name: nameCapitalize } });
+        const existingRol = await Rol.findOne({ where: { name: nameCapitalize, id_company:id_company } });
         if(existingRol) return res.status(400).json({ message: 'Cannot use a duplicate rol name' });
     }
 
