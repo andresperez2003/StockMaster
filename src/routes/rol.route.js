@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getRoles,getRolById, createRol, updateRol, deleteRol} from '../controllers/rol.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

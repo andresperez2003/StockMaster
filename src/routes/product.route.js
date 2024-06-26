@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductPerCategory} from '../controllers/product.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 
@@ -42,7 +42,7 @@ router.get('/products/:company',  getProducts)
 router.get('/products/:company/:id',  getProductById)
 
 
-router.get('/productsByCategory/menu/:company',  getProductPerCategory)
+router.get('/menu/:company', validateToken,  getProductPerCategory)
 
 
 /**

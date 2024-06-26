@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getCities, getCityById, getCityByName, getCityByDepartment, createCity, updateCity, deleteCity} from '../controllers/city.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

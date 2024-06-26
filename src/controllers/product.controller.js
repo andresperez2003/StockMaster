@@ -3,6 +3,7 @@ import { json } from 'sequelize';
 import { Product } from '../models/product.model.js'; // Importa el modelo Company que defines en otro archivo
 import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne, getModelByParameterManyWithJoin} from "./general.controller.js"
 import { Category } from '../models/category.model.js';
+import { decodeAccessToken, validateTokenOnMethods } from '../middleware/token.js';
 
 
 
@@ -148,11 +149,16 @@ export const deleteProduct = async(req,res)=>{
 }
 
 export const getProductPerCategory = async(req,res)=>{
+
     const {company} = req.params
     const categories = await getModelByParameterMany(Category, "id_company", company)
     const dicCategoryName ={}
     const dicCategory ={}
     let nuevoDicCategory = {};
+
+
+
+
 
     for(let campusObj of categories.model ){
         dicCategoryName[campusObj.id] = campusObj.name

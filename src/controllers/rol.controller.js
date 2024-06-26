@@ -1,7 +1,7 @@
 
 import { json } from 'sequelize';
 import { Rol } from '../models/rol.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne, getModelByManyParameters} from "./general.controller.js"
 
 
 
@@ -15,6 +15,18 @@ export const getRoles = async(req,res)=> {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
 }
+
+
+export const getRolByIdMethod = async(id, id_company)=> {
+    const result = await getModelByManyParameters(Rol, { id: id, id_company: id_company });
+    if (result.success) {
+        return result.model;
+    } else {
+        return null
+    }
+}
+
+
 
 //Metodo que trae un rol especifico
 //Parametros: id

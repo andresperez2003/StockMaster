@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getDepartment,getDepartmentById,getDepartmentByName,updateDepartment,createDepartment, deleteDepartment, getDepartmentByCountry} from '../controllers/department.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

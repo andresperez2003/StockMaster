@@ -1,7 +1,7 @@
 
 import { json } from 'sequelize';
 import { RolXPermiss } from '../models/rolXPermiss.model.js';
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterManyWithJoin, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany} from "./general.controller.js"
+import { createModel, updateModel, deleteModel, getModelByParameterManyWithJoin, getModelByParameterMany, getModelByManyParameterWithJoin} from "./general.controller.js"
 import { UserXPermiss } from '../models/userXpermiss.model.js';
 import { Rol } from '../models/rol.model.js';
 import { Permiss } from '../models/permiss.model.js';
@@ -72,6 +72,24 @@ export const createRolXPermiss =  async(req,res)=> {
         res.status(result.status).json({ message: result.message, error: result.error });
     }
  }
+
+export const getRolXPermissByRolAndCompany = async(id_rol, id_company)=> {   
+    const result = await getModelByManyParameterWithJoin(RolXPermiss, {"id_rol":id_rol, "id_company": id_company}, ["id"],
+        [
+            {model: Rol, required:true, attributes:["name"]},
+            {model: Permiss, required:true, attributes:["id"], include:[
+                {model:Operation, required:true, attributes:["name"]},
+                {model:Module, required:true, attributes:["name"]}
+            ]}
+        ]);
+    console.log(result);
+    if (result.success) {
+        return result.model;
+    } else {
+        return null
+    }
+
+}
 
 
  

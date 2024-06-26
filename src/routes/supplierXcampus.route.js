@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getSupplierXCampus, getSupplierXCampusById, createSupplierXCampus, updateSupplierXCampus, deleteSupplierXCampus} from '../controllers/supplierXcampus.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

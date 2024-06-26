@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getSales, getSaleById, updateSale, createSale, deleteSale, getSaleByBill} from '../controllers/sale.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

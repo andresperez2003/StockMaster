@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getProductXProduct, getProductXProductById, updateProductXProduct, createProductXProduct, deleteProductXProduct} from '../controllers/productXproduct.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

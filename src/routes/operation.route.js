@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getOperations, getOperationById, updateOperation, createOperation, deleteOperation} from '../controllers/operation.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

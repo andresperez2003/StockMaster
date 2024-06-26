@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getUsers, getUserById, createUser, updateUser, deleteUser, UserLogin} from '../controllers/user.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

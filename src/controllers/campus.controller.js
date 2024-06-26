@@ -53,6 +53,18 @@ export const getCampusByCompany = async(req,res)=>{
 
 
 
+export const getCampusByIdMethod = async(id) =>{
+    const result = await getModelById(Campus, id);
+    if (result.success) {
+        return result.model;
+    } else {
+        return null;
+    }
+}
+
+
+
+
 
 //Metodo que crea un nuevo campus
 //Parametros: name, description

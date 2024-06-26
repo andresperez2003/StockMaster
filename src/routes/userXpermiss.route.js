@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getUserXPermiss, getUserXPermissById, createUserXPermiss, updateUserXPermiss, deleteUserXPermiss} from '../controllers/userXpermiss.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

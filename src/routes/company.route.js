@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getCompanies, getCompanyById, createCompany, updateCompany, deleteCompany, getCompanyOnlyActive, getCompanyOnlyInactive} from '../controllers/company.controller.js'
-import {validateToken} from '../middleware/verifyToken.js'
+import {validateToken} from '../middleware/token.js'
 
 const router = Router()
 

@@ -1,16 +1,18 @@
 
 import { User } from '../models/user.model.js'; // Importa el modelo Company que defines en otro archivo
 import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin} from "./general.controller.js"
-import jwt from 'jsonwebtoken'
 import { Rol } from '../models/rol.model.js';
 import {config} from 'dotenv'
 import bcrypt from 'bcrypt'
-import { Campus } from '../models/campus.model.js';
+import { decodeAccessToken, generateAccessToken, validateTokenOnMethods } from '../middleware/token.js';
+import { getRolByIdMethod } from './rol.controller.js';
+import { getCampusByIdMethod } from './campus.controller.js';
+import { getRolXPermissByRolAndCompany } from './rolXpermiss.controller.js';
 
 config()
 
 const namePrimaryKey='identification'
-
+const module = 'User'
 
 
 //Metodo que devuelve todos los usuarios
@@ -62,6 +64,37 @@ export const getUserById = async (req, res) => {
 export const createUser =  async(req,res)=> {
     const { identification, name, lastname, username, status, photo, email, phone, id_rol, id_campus } = req.body;
     let {password} = req.body;
+
+    const token = req.headers.authorization;
+    const formattedToken = token && token.startsWith('Bearer ') ? token.slice(7) : token;
+    const validToken = await validateTokenOnMethods(formattedToken);
+    
+    if(!token){return res.status(401).json({message:"Access denied"})}
+
+    if (!validToken) {return res.status(401).json({ message: 'Access denied, token not valid' });}
+
+    const dataToken = decodeAccessToken(formattedToken);
+    
+    console.log(dataToken.campus);
+
+    const campus = await getCampusByIdMethod(dataToken.campus)
+
+
+    const permiss = await getRolXPermissByRolAndCompany(dataToken.rol, campus.dataValues.id_company)
+    
+    let hasPermiss = false
+
+    for (const permissObj of permiss) {
+        if(permissObj.Permiss.Operation.name == "Agregar" && permissObj.Permiss.Module.name == module){
+            hasPermiss = true
+        }
+    }
+
+    if(!hasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
+        
+
+    if(dataToken.rol != 1) return res.status(401).json({message:"Unauthorized"})
+    
     if(!name) return res.status(400).json({message:"Fill all fields"})
     
     const nameLower = name.toLowerCase();
@@ -80,7 +113,7 @@ export const createUser =  async(req,res)=> {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     password = hashedPassword
 
-    const result = await createModel(User, { identification, nameCapitalize, lastnameCapitalize, username, password, status, photo, email, phone, id_rol, id_campus });
+    const result = await createModel(User, { identification, name:nameCapitalize, lastname:lastnameCapitalize, username, password, status, photo, email, phone, id_rol, id_campus });
     if (result.success) {
         res.status(result.status).json({ message: 'User created' });
     } else {
@@ -195,25 +228,22 @@ export const UserLogin = async(req,res)=>{
     const user = await getUserByEmail(email)
     const hashedPassword = user.model.dataValues.password
     if(bcrypt.compare(password, hashedPassword)){
-        const accessToken = generateAccessToken(user);
+        const userToken = {
+            email: user.model.email, 
+            username: user.model.username, 
+            status:user.model.status,
+            name:user.model.name, 
+            lastname: user.model.lastname,
+            id: user.model.identification, 
+            rol: user.model.id_rol, 
+            campus: user.model.id_campus
+        }
+        const accessToken = generateAccessToken(userToken);
         return res.status(200).json({ message: 'Logged', token:accessToken });
     }
+
     return res.status(401).json({ message: "Not authorized" });
 }
 
-function generateAccessToken(user){
-    return jwt.sign(user, process.env.SECRET, {expiresIn: '30m'})
-}
 
-function validateToken(req,res,next){
-    const accessToken = req.headers['authorization']
-    if(!accessToken) res.status(401).json({message:"Access denied"})
 
-    jwt.verify(accessToken, process.env.SECRET, (err, user)=>{
-        if(err){
-            res.status(401).json({message:"Access denied, token not valid"})
-        }else{
-            next();
-        }
-    })
-}
