@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getClients, getClientById, createClient, updateClient, deleteClient} from '../controllers/client.controller.js'
-import {validateToken} from '../middleware/token.js'
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 

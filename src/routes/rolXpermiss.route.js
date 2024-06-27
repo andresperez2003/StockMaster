@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getRolXPermiss, getRolXPermissById, createRolXPermiss, updateRolXPermiss, deleteRolXPermiss} from '../controllers/rolXpermiss.controller.js'
-import {validateToken} from '../middleware/token.js'
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 

@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getPermiss, getPermissById, createPermiss, updatePermiss, deletePermiss} from '../controllers/permiss.controller.js'
-import {validateToken} from '../middleware/token.js'
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 

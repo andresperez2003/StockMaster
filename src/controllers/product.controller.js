@@ -3,7 +3,7 @@ import { json } from 'sequelize';
 import { Product } from '../models/product.model.js'; // Importa el modelo Company que defines en otro archivo
 import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne, getModelByParameterManyWithJoin} from "./general.controller.js"
 import { Category } from '../models/category.model.js';
-import { decodeAccessToken, validateTokenOnMethods } from '../middleware/token.js';
+import { decodeAccessToken} from '../middleware/verifyToken.js';
 
 
 

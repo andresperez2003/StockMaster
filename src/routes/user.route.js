@@ -1,6 +1,7 @@
 import {Router} from 'express'
 import {getUsers, getUserById, createUser, updateUser, deleteUser, UserLogin} from '../controllers/user.controller.js'
-import {validateToken} from '../middleware/token.js'
+import {validateToken} from '../middleware/verifyToken.js'
+
 
 const router = Router()
 
@@ -91,7 +92,7 @@ router.get('/users/:campus/:identification',  getUserById)
  *         description: Usuario editado
 
  */
-router.post('/users',  createUser)
+router.post('/users', validateToken,  createUser)
 
 
 

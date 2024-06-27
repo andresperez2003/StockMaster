@@ -4,10 +4,11 @@ import {getModelById, createModel, updateModel, deleteModel, getModelByParameter
 import { Rol } from '../models/rol.model.js';
 import {config} from 'dotenv'
 import bcrypt from 'bcrypt'
-import { decodeAccessToken, generateAccessToken, validateTokenOnMethods } from '../middleware/token.js';
+import { decodeAccessToken, generateAccessToken } from '../middleware/token.js';
 import { getRolByIdMethod } from './rol.controller.js';
 import { getCampusByIdMethod } from './campus.controller.js';
 import { getRolXPermissByRolAndCompany } from './rolXpermiss.controller.js';
+import { getUserXPermissByUserAndCompany } from './userXpermiss.controller.js';
 
 config()
 
@@ -64,54 +65,25 @@ export const getUserById = async (req, res) => {
 export const createUser =  async(req,res)=> {
     const { identification, name, lastname, username, status, photo, email, phone, id_rol, id_campus } = req.body;
     let {password} = req.body;
-
-    const token = req.headers.authorization;
-    const formattedToken = token && token.startsWith('Bearer ') ? token.slice(7) : token;
-    const validToken = await validateTokenOnMethods(formattedToken);
+    const token = req.headers.authorization;    
     
-    if(!token){return res.status(401).json({message:"Access denied"})}
+    const dataToken = decodeAccessToken(token);
 
-    if (!validToken) {return res.status(401).json({ message: 'Access denied, token not valid' });}
+    let rolHasPermiss = await hasPermissRolToCreate(dataToken)
+    let userHasPermiss = await hasPermissUserToCreate(dataToken)
 
-    const dataToken = decodeAccessToken(formattedToken);
+    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
     
-    console.log(dataToken.campus);
-
-    const campus = await getCampusByIdMethod(dataToken.campus)
-
-
-    const permiss = await getRolXPermissByRolAndCompany(dataToken.rol, campus.dataValues.id_company)
     
-    let hasPermiss = false
-
-    for (const permissObj of permiss) {
-        if(permissObj.Permiss.Operation.name == "Agregar" && permissObj.Permiss.Module.name == module){
-            hasPermiss = true
-        }
-    }
-
-    if(!hasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
-        
-
-    if(dataToken.rol != 1) return res.status(401).json({message:"Unauthorized"})
+    if(!name || !identification || !lastname || !email || !id_rol || !id_campus || !username) return res.status(400).json({message:"Fill all fields"})
     
-    if(!name) return res.status(400).json({message:"Fill all fields"})
-    
-    const nameLower = name.toLowerCase();
-    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+    const nameCapitalize = textCapitalized(name)
+    const lastnameCapitalize = textCapitalized(lastname)
 
-    const lastnameLower = lastname.toLowerCase();
-    const lastnameCapitalize = lastnameLower.charAt(0).toUpperCase() + lastnameLower.slice(1);
+    const userRepeat = await userAlreadyExist(identification, id_campus, email) 
+    if(userRepeat) return res.status(400).json({ message: 'Cannot create a duplicate user' });
 
-
-    const existingUser = await User.findOne({ where: { identification: identification, id_campus:id_campus } });
-    const existingEmail = await User.findOne({ where: { email: email } });
-    if (existingUser || existingEmail) {
-        return res.status(400).json({ message: 'Cannot create a duplicate user' });
-    }
-    const saltRounds = 10; // Número de rondas de hashing (mayor es más seguro pero más lento)
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    password = hashedPassword
+    password = await hashPassword(password)
 
     const result = await createModel(User, { identification, name:nameCapitalize, lastname:lastnameCapitalize, username, password, status, photo, email, phone, id_rol, id_campus });
     if (result.success) {
@@ -119,6 +91,56 @@ export const createUser =  async(req,res)=> {
     } else {
         res.status(result.status).json({ message: result.message, error: result.error });
     }
+ }
+
+
+export const textCapitalized = (text)=>{
+    const textLower = text.toLowerCase();
+    const textCapitalize = textLower.charAt(0).toUpperCase() + textLower.slice(1);
+    return textCapitalize
+}
+
+export const userAlreadyExist = async(identification, id_campus, email)=>{
+    const existingUser = await User.findOne({ where: { identification: identification, id_campus:id_campus } });
+    console.log("user",existingUser);
+    const existingEmail = await User.findOne({ where: { email: email } });
+    console.log("email",existingEmail);
+    if (existingUser || existingEmail) {
+        return true
+    }
+    return false
+}
+
+export const hashPassword = async(password)=>{
+    const saltRounds = 10; // Número de rondas de hashing (mayor es más seguro pero más lento)
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    password = hashedPassword
+    return password
+}
+
+
+ export const hasPermissRolToCreate = async(dataToken)=>{
+    const campus = await getCampusByIdMethod(dataToken.campus)
+    const permiss = await getRolXPermissByRolAndCompany(dataToken.rol, campus.dataValues.id_company)
+    let hasPermiss = false
+    for (const permissObj of permiss) {
+        if(permissObj.Permiss.Operation.name == "Agregar" && permissObj.Permiss.Module.name == module){
+            hasPermiss = true
+        }
+    }
+    return hasPermiss
+ }
+
+ export const hasPermissUserToCreate = async(dataToken)=>{
+    const campus = await getCampusByIdMethod(dataToken.campus)
+    const userxpermiss = await getUserXPermissByUserAndCompany(dataToken.id, campus.dataValues.id_company)
+    let hasPermiss = false
+    for (const permissObj of userxpermiss) {
+        if(permissObj.Permiss.Operation.name == "Agregar" && permissObj.Permiss.Module.name == module){
+            hasPermiss = true
+        }
+    }
+    return hasPermiss
  }
 
 

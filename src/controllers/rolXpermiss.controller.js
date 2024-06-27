@@ -82,7 +82,6 @@ export const getRolXPermissByRolAndCompany = async(id_rol, id_company)=> {
                 {model:Module, required:true, attributes:["name"]}
             ]}
         ]);
-    console.log(result);
     if (result.success) {
         return result.model;
     } else {

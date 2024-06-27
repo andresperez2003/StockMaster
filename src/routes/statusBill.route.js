@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getStatusBill, getStatusBillById, getStatusBillByName, createStatusBill, updateStatusBill,deleteStatusBill} from '../controllers/statusBill.controller.js'
-import {validateToken} from '../middleware/token.js'
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 

@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {getCategories,getCategoryById,createCategory,deleteCategory,updateCategory} from '../controllers/category.controller.js'
-import {validateToken} from '../middleware/token.js'
+import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
 

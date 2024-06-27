@@ -3,42 +3,15 @@ import {config} from 'dotenv'
 
 config()
 
-const validateToken = (req,res,next)=>{
-    const accessToken = req.headers['authorization'] || req.query.accessToken
-    if(!accessToken) return res.status(401).json({message:"Access denied"})
-    const token = accessToken.slice(7)
-    jwt.verify(token, process.env.SECRET, (err, user)=>{
-        if(err){
-            res.status(401).json({message:"Access denied, token not valid", err: err})
-        }else{
-            next();
-        }
-    })
-}
-
-
-const validateTokenOnMethods = (accessToken) => {
-    return new Promise((resolve, reject) => {
-      jwt.verify(accessToken, process.env.SECRET, (err) => {
-        if (err) {
-          resolve(false); // Resuelve la promesa con false si hay un error
-        } else {
-          resolve(true); // Resuelve la promesa con true si el token es válido
-        }
-      });
-    });
-  };
 
 const  generateAccessToken = (user)=>{
-    return jwt.sign(user, process.env.SECRET, {expiresIn: '30m'})
+    return jwt.sign(user, process.env.SECRET, {expiresIn: '40m'})
 }
 
-const  decodeAccessToken = (user)=>{
-    return jwt.decode(user)
+const  decodeAccessToken = (token)=>{
+    const formattedToken = token && token.startsWith('Bearer ') ? token.slice(7) : token;
+    return jwt.decode(formattedToken)
 }
 
 
-
-
-
-export { validateToken , generateAccessToken, decodeAccessToken, validateTokenOnMethods};
+export { generateAccessToken, decodeAccessToken};
