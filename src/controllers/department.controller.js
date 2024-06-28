@@ -119,7 +119,6 @@ export const getDepartmentByName = async(req,res)=>{
 //Parametros: id_country
 export const getDepartmentByCountry = async(req,res)=>{
     const { country } = req.params;
-    console.log("country ");
 
 
     const result = await getModelByParameterMany(Department,"id_country", country);

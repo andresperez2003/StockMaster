@@ -37,7 +37,6 @@ export const getBillsById = async(req,res)=>{
 //Parametros: name, description
 export const createBill =  async(req,res)=> {
     const { id, date_bill, id_campus, status, id_user, id_client } = req.body;
-    console.log(id, date_bill, id_campus, status, id_user, id_client );
     if( !id || !date_bill || !id_campus || !status || !id_user || !id_client ) return res.status(400).json({message:"Fill all fields"})
 
     const existingBill = await Bill.findOne({ where: { date_bill: date_bill, id_campus:id_campus, id_user:id_user,id_client:id_client  } });

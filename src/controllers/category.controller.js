@@ -80,7 +80,6 @@ export const updateCategory = async(req,res)=>{
     let categorySelected= null
     let categoryFound = false
     categories.model.forEach(element => {
-        console.log(element);
         if(element.id == id ){
             categorySelected = element
             categoryFound=true

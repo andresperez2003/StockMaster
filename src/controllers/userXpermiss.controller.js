@@ -143,7 +143,6 @@ export const getUserXPermissByUserAndCompany = async(id_user, id_company)=>{
                 {model:Module, required:true, attributes:["name"]}
             ]}
         ]);
-    console.log(result);
     if (result.success) {
         return result.model;
     } else {

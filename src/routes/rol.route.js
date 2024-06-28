@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getRoles,getRolById, createRol, updateRol, deleteRol} from '../controllers/rol.controller.js'
+import {getRoles, createRol, updateRol, deleteRol, getRolByParameters, getRolById} from '../controllers/rol.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -16,32 +16,14 @@ const router = Router()
  *     tags:
  *       - Rols    
  */
-router.get('/rols/:company',  getRoles)
+router.get('/rols/:company', validateToken, getRoles)
 
 
-/**
- * @swagger
- * /api/v1/rols/{id}:
- *   get:
- *     summary: Retorna un rol por su id
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: id del rol
- *         schema:
- *           type: string
- *     tags:
- *       - Rols
- *     responses:
- *       200:
- *         description: Rol encontrado
- *       404:
- *         description: Rol no encontrado
- */
-router.get('/rols/:company/:id',  getRolById)
+
+router.get('/rols/parameters/:company/:name', validateToken,  getRolByParameters)
 
 
+router.get('/rols/:company/:id', validateToken, getRolById)
 
 /**
  * @swagger
@@ -71,7 +53,7 @@ router.get('/rols/:company/:id',  getRolById)
  *         description: Rol creado
 
  */
-router.post('/rols',   createRol)
+router.post('/rols',  validateToken ,   createRol)
 
 
 /**
@@ -110,7 +92,7 @@ router.post('/rols',   createRol)
  *       404:
  *         description: Rol no encontrado
  */7
-router.put('/rols/:company/:id',   updateRol)
+router.put('/rols/:company/:id', validateToken ,   updateRol)
 
 
 

@@ -40,7 +40,6 @@ export const getRolXPermissById = async(req,res)=>{
                 {model:Module, required:true, attributes:["name"]}
             ]}
         ]);
-console.log(result.model);
     for (const campusObj of result.model) {
             if (campusObj.id == id) {
                 return res.status(result.status).json({RolXPermiss:campusObj});

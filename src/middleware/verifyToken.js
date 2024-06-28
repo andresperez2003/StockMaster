@@ -17,16 +17,4 @@ const validateToken = (req,res,next)=>{
 }
 
 
-const  generateAccessToken = (user)=>{
-    return jwt.sign(user, process.env.SECRET, {expiresIn: '30m'})
-}
-
-const  decodeAccessToken = (user)=>{
-    return jwt.decode(user)
-}
-
-
-
-
-
-export { validateToken , generateAccessToken, decodeAccessToken};
+export { validateToken};

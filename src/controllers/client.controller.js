@@ -40,7 +40,6 @@ export const getClientById = async(req,res)=>{
 //Parametros: identification, name, lastname, email, status, phone, id_city, id_company, address
 export const createClient =  async(req,res)=> {
     const { identification, name, lastname, email, status, phone, id_city, id_company, address } = req.body;
-    console.log(identification, name, lastname, email, status, phone, id_city, id_company, address);
     
     if(!name || !identification || !lastname || !email || !id_city  || !phone || !id_company || !address) return res.status(400).json({message:"Fill all fields"})
     
@@ -70,7 +69,6 @@ export const updateClient = async (req, res) => {
     let clientSelected= null
     let clientFound = false
     clients.model.forEach(element => {
-        console.log(element);
         if(element.identification == identification ){
             clientSelected = element
             clientFound=true

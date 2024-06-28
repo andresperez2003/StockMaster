@@ -1,14 +1,11 @@
 
 import { User } from '../models/user.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin} from "./general.controller.js"
+import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin, textCapitalized, modelAlreadyExist, hasPermissRol, hasPermissUser} from "./general.controller.js"
 import { Rol } from '../models/rol.model.js';
 import {config} from 'dotenv'
 import bcrypt from 'bcrypt'
 import { decodeAccessToken, generateAccessToken } from '../middleware/token.js';
-import { getRolByIdMethod } from './rol.controller.js';
-import { getCampusByIdMethod } from './campus.controller.js';
-import { getRolXPermissByRolAndCompany } from './rolXpermiss.controller.js';
-import { getUserXPermissByUserAndCompany } from './userXpermiss.controller.js';
+
 
 config()
 
@@ -69,8 +66,8 @@ export const createUser =  async(req,res)=> {
     
     const dataToken = decodeAccessToken(token);
 
-    let rolHasPermiss = await hasPermissRolToCreate(dataToken)
-    let userHasPermiss = await hasPermissUserToCreate(dataToken)
+    let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
+    let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
 
     if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
     
@@ -80,8 +77,10 @@ export const createUser =  async(req,res)=> {
     const nameCapitalize = textCapitalized(name)
     const lastnameCapitalize = textCapitalized(lastname)
 
-    const userRepeat = await userAlreadyExist(identification, id_campus, email) 
-    if(userRepeat) return res.status(400).json({ message: 'Cannot create a duplicate user' });
+    const userRepeat = await modelAlreadyExist({identification:identification},User)
+    const emailRepeat = await modelAlreadyExist({email:email},User)
+
+    if(userRepeat || emailRepeat) return res.status(400).json({ message: 'Cannot create a duplicate user' });
 
     password = await hashPassword(password)
 
@@ -94,22 +93,6 @@ export const createUser =  async(req,res)=> {
  }
 
 
-export const textCapitalized = (text)=>{
-    const textLower = text.toLowerCase();
-    const textCapitalize = textLower.charAt(0).toUpperCase() + textLower.slice(1);
-    return textCapitalize
-}
-
-export const userAlreadyExist = async(identification, id_campus, email)=>{
-    const existingUser = await User.findOne({ where: { identification: identification, id_campus:id_campus } });
-    console.log("user",existingUser);
-    const existingEmail = await User.findOne({ where: { email: email } });
-    console.log("email",existingEmail);
-    if (existingUser || existingEmail) {
-        return true
-    }
-    return false
-}
 
 export const hashPassword = async(password)=>{
     const saltRounds = 10; // Número de rondas de hashing (mayor es más seguro pero más lento)
@@ -117,31 +100,6 @@ export const hashPassword = async(password)=>{
     password = hashedPassword
     return password
 }
-
-
- export const hasPermissRolToCreate = async(dataToken)=>{
-    const campus = await getCampusByIdMethod(dataToken.campus)
-    const permiss = await getRolXPermissByRolAndCompany(dataToken.rol, campus.dataValues.id_company)
-    let hasPermiss = false
-    for (const permissObj of permiss) {
-        if(permissObj.Permiss.Operation.name == "Agregar" && permissObj.Permiss.Module.name == module){
-            hasPermiss = true
-        }
-    }
-    return hasPermiss
- }
-
- export const hasPermissUserToCreate = async(dataToken)=>{
-    const campus = await getCampusByIdMethod(dataToken.campus)
-    const userxpermiss = await getUserXPermissByUserAndCompany(dataToken.id, campus.dataValues.id_company)
-    let hasPermiss = false
-    for (const permissObj of userxpermiss) {
-        if(permissObj.Permiss.Operation.name == "Agregar" && permissObj.Permiss.Module.name == module){
-            hasPermiss = true
-        }
-    }
-    return hasPermiss
- }
 
 
  
@@ -157,7 +115,6 @@ export const updateUser = async (req, res) => {
     let userSelected= null
     let userFound = false
     users.model.forEach(element => {
-        console.log(element);
         if(element.identification == identification ){
             userSelected = element
         }
@@ -217,7 +174,6 @@ export const deleteUser = async(req,res)=>{
     const { campus, identification } = req.params;
 
     const users = await getModelByParameterMany(User,"id_campus",campus)
-    console.log(users);
     let userFound = false;
     let userSelected=null
     users.model.forEach(element => {

@@ -1,4 +1,12 @@
 
+import { getCampusByIdMethod } from './campus.controller.js';
+import { getRolXPermissByRolAndCompany } from './rolXpermiss.controller.js';
+import { getUserXPermissByUserAndCompany } from './userXpermiss.controller.js';
+
+export const addOperation = "Agregar"
+export const deleOperation = "Eliminar"
+export const updateOperation = "Editar"
+export const searchOperation = "Buscar"
 
 export const createModel = async (Model, data) => {
     try {
@@ -126,7 +134,6 @@ export const getAllModels = async (Model) => {
 
 export const getAllModelsWithJoin = async (Model,attributes, joins) => {
     try {
-        console.log(attributes);
         const models = await Model.findAll({
             include: joins.length > 0 ? joins : undefined,
             attributes: attributes.length > 0 ? attributes : undefined
@@ -155,3 +162,38 @@ export const getModelByIdWithJoin = async (Model, id, attributes, joins) => {
         return { success: false, error: error.message, status:500,  message: 'Something went wrong'  };
     }
 };
+
+export const textCapitalized = (text)=>{
+    const textLower = text.toLowerCase();
+    const textCapitalize = textLower.charAt(0).toUpperCase() + textLower.slice(1);
+    return textCapitalize
+}
+
+export const modelAlreadyExist = async(parameters, Model)=>{
+    const existingModel = await Model.findOne({ where: parameters });
+    return existingModel ? true : false
+}
+
+export const hasPermissRol = async(dataToken, operation, module)=>{
+    const campus = await getCampusByIdMethod(dataToken.campus)
+    const permiss = await getRolXPermissByRolAndCompany(dataToken.rol, campus.dataValues.id_company)
+    let hasPermiss = false
+    for (const permissObj of permiss) {
+        if(permissObj.Permiss.Operation.name == operation && permissObj.Permiss.Module.name == module){
+            hasPermiss = true
+        }
+    }
+    return hasPermiss
+ }
+
+ export const hasPermissUser= async(dataToken, operation, module)=>{
+    const campus = await getCampusByIdMethod(dataToken.campus)
+    const userxpermiss = await getUserXPermissByUserAndCompany(dataToken.id, campus.dataValues.id_company)
+    let hasPermiss = false
+    for (const permissObj of userxpermiss) {
+        if(permissObj.Permiss.Operation.name == operation && permissObj.Permiss.Module.name == module){
+            hasPermiss = true
+        }
+    }
+    return hasPermiss
+ }

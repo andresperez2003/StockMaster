@@ -69,7 +69,6 @@ export const updateSupplier = async(req,res)=>{
     let supplierSelected= null
     let supplierFound = false
     suppliers.model.forEach(element => {
-        console.log(element);
         if(element.id == id ){
             supplierSelected = element
             supplierFound=true

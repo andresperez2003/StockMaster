@@ -108,7 +108,6 @@ export const getCountryByName = async(req,res)=>{
     if (result.success) {
         res.status(result.status).json(result.model);
     } else {
-        console.log("Entra");
         res.status(result.status).json({ message: 'Country not found', error: result.error });
     }
 }

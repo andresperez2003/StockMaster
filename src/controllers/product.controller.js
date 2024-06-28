@@ -3,14 +3,12 @@ import { json } from 'sequelize';
 import { Product } from '../models/product.model.js'; // Importa el modelo Company que defines en otro archivo
 import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne, getModelByParameterManyWithJoin} from "./general.controller.js"
 import { Category } from '../models/category.model.js';
-import { decodeAccessToken} from '../middleware/verifyToken.js';
 
 
 
 //Metodo que devuelve todos los productos
 export const getProducts = async(req,res)=> {
         const {company} = req.params
-        console.log(company);
         const result = await getModelByParameterManyWithJoin(Product, "id_company", company,
             ["id","name","price_sale","price_unit","description","photo","status","discount","id_company"],
             [
@@ -74,7 +72,6 @@ export const updateProduct = async(req,res)=>{
     let productSelected= null
     let productFound = false
     products.model.forEach(element => {
-        console.log(element);
         if(element.id == id ){
             productSelected = element
             productFound=true

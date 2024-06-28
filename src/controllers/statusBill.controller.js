@@ -45,7 +45,6 @@ export const getStatusBillByName = async(req,res)=>{
 //Parametros: name, description
 export const createStatusBill =  async(req,res)=> {
     const { name, id_company } = req.body;
-    console.log(id_company);
     if(!name || !id_company) return res.status(400).json({message:"Fill all fields"})
 
     const nameLower = name.toLowerCase();
@@ -79,7 +78,6 @@ export const updateStatusBill = async(req,res)=>{
     let statusBillSelected= null
     let statusBillFound = false
     statusBills.model.forEach(element => {
-        console.log(element);
         if(element.id == id ){
             statusBillSelected = element
             statusBillFound=true
