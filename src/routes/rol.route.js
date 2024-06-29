@@ -116,7 +116,7 @@ router.put('/rols/:company/:id', validateToken ,   updateRol)
  *       404:
  *         description: Rol no encontrado
  */
-router.delete('/rols/:company/:id', deleteRol)
+router.delete('/rols/:company/:id', validateToken, deleteRol)
 
 
 

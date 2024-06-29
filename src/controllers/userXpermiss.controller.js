@@ -1,7 +1,7 @@
 
 import { json } from 'sequelize';
 import { UserXPermiss } from '../models/userXpermiss.model.js';
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterManyWithJoin, getModelByParameterMany, getModelByManyParameterWithJoin} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterManyWithJoin, getModelByParameterMany, getModelByManyParameterWithJoinMany} from "./general.controller.js"
 import { User } from '../models/user.model.js';
 import { Operation } from '../models/operation.model.js';
 import { Module } from '../models/module.model.js';
@@ -135,7 +135,7 @@ export const deleteUserXPermiss = async(req,res)=>{
 }
 
 export const getUserXPermissByUserAndCompany = async(id_user, id_company)=>{
-    const result = await getModelByManyParameterWithJoin(UserXPermiss, {"id_user":id_user, "id_company": id_company}, ["id"],
+    const result = await getModelByManyParameterWithJoinMany(UserXPermiss, {"id_user":id_user, "id_company": id_company}, ["id"],
         [
             {model: User, required:true, attributes:["identification"]},
             {model: Permiss, required:true, attributes:["id"], include:[

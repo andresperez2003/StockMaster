@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getClients, getClientById, createClient, updateClient, deleteClient} from '../controllers/client.controller.js'
+import {getClients, getClientById, createClient, updateClient, deleteClient, getClientByDetails, getClientsInactive} from '../controllers/client.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -16,8 +16,10 @@ const router = Router()
  *     tags:
  *       - Clients    
  */
-router.get('/clients/:company', getClients)
+router.get('/clients/:company', validateToken ,  getClients)
 
+
+router.get('/clients/inactive/:company', validateToken ,  getClientsInactive)
 
 /**
  * @swagger
@@ -39,7 +41,7 @@ router.get('/clients/:company', getClients)
  *       404:
  *         description: Cliente no encontrado
  */
-router.get('/clients/:company/:identification', getClientById)
+router.get('/clients/:company/:identification', validateToken ,getClientById)
 
 
 /**
@@ -88,7 +90,12 @@ router.get('/clients/:company/:identification', getClientById)
  *         description: Usuario editado
 
  */
-router.post('/clients',   createClient)
+router.post('/clients', validateToken ,  createClient)
+
+
+
+
+router.post('/clients/details/:company',  validateToken , getClientByDetails)
 
 
 
@@ -142,7 +149,7 @@ router.post('/clients',   createClient)
  *         description: Cliente actualizado
 
  */
-router.put('/clients/:company/:identification',  updateClient)
+router.put('/clients/:company/:identification', validateToken , updateClient)
 
 
 
@@ -166,6 +173,6 @@ router.put('/clients/:company/:identification',  updateClient)
  *       404:
  *         description: Cliente no encontrado
  */
-router.delete('/clients/:company/:identification',   deleteClient)
+router.delete('/clients/:company/:identification',  validateToken,   deleteClient)
 
 export default router

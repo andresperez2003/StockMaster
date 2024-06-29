@@ -1,7 +1,7 @@
 
 import { json } from 'sequelize';
 import { RolXPermiss } from '../models/rolXPermiss.model.js';
-import { createModel, updateModel, deleteModel, getModelByParameterManyWithJoin, getModelByParameterMany, getModelByManyParameterWithJoin} from "./general.controller.js"
+import { createModel, updateModel, deleteModel, getModelByParameterManyWithJoin, getModelByParameterMany, getModelByManyParameterWithJoinMany} from "./general.controller.js"
 import { UserXPermiss } from '../models/userXpermiss.model.js';
 import { Rol } from '../models/rol.model.js';
 import { Permiss } from '../models/permiss.model.js';
@@ -73,7 +73,7 @@ export const createRolXPermiss =  async(req,res)=> {
  }
 
 export const getRolXPermissByRolAndCompany = async(id_rol, id_company)=> {   
-    const result = await getModelByManyParameterWithJoin(RolXPermiss, {"id_rol":id_rol, "id_company": id_company}, ["id"],
+    const result = await getModelByManyParameterWithJoinMany(RolXPermiss, {"id_rol":id_rol, "id_company": id_company}, ["id"],
         [
             {model: Rol, required:true, attributes:["name"]},
             {model: Permiss, required:true, attributes:["id"], include:[

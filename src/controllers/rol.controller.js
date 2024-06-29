@@ -1,8 +1,10 @@
 
 import { json } from 'sequelize';
 import { Rol } from '../models/rol.model.js'; // Importa el modelo Company que defines en otro archivo
-import {createModel, updateModel, deleteModel, getModelByParameterMany, getModelByManyParameters, searchOperation, textCapitalized, hasPermissRol, hasPermissUser, modelAlreadyExist, addOperation, getModelByParameterOne, getModelByManyParameterWithJoin} from "./general.controller.js"
+import {createModel, updateModel, deleteModel, getModelByParameterMany, getModelByManyParameters, searchOperation, textCapitalized, hasPermissRol, hasPermissUser, modelAlreadyExist, addOperation, getModelByParameterOne, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, getModelById} from "./general.controller.js"
 import { decodeAccessToken } from '../middleware/token.js';
+import { User } from '../models/user.model.js';
+import { getCampusByIdMethod } from './campus.controller.js';
 
 
 const module = "Rol"
@@ -156,21 +158,26 @@ export const updateRol = async(req,res)=>{
 //Parametros: id
 export const deleteRol = async(req,res)=>{
     const { company, id } = req.params;
-    const rols = await getModelByParameterMany(Rol, "id_company", company)
-    let rolFound = false;
-    for (const campusObj of rols.model) {
-        if (campusObj.id == id) {
-            const result = await deleteModel(Rol, id);
-            if (result.success) { 
-                rolFound= true;
-                return res.status(result.status).json({ message: 'Rol deleted' });
-            } else {
-                return res.status(result.status).json({ message: result.message, error: result?.error });
-            }
-        }
-    }
 
-    if (!rolFound) {
-        return res.status(404).json({ message: 'Rol not found' });
-    }
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+    const campus = await getCampusByIdMethod(dataToken.campus)
+    const rol = await getModelById(Rol, id)
+
+    if(rol.id_company != campus.id_company ) return res.status(401).json({message:"Forbidden"})
+
+    const users = await getModelByManyParameterWithJoinMany(User, {"id_rol":id})
+    const length = users.model.length
+    
+    if(length>0) return res.status(400).json({message:"Cant delete a rol with users asociated"})
+    
+    const result = await deleteModel(Rol,id)
+    return  result.success ? res.status(200).json({message: "Rol successful deleted"}): res.status(400).json({message:"Something went wrong", err: result.error})
+   
 }
