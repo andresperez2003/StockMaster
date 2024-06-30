@@ -1,10 +1,11 @@
 
 import { User } from '../models/user.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin, textCapitalized, modelAlreadyExist, hasPermissRol, hasPermissUser} from "./general.controller.js"
+import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin, textCapitalized, modelAlreadyExist, hasPermissRol, hasPermissUser, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne} from "./general.controller.js"
 import { Rol } from '../models/rol.model.js';
 import {config} from 'dotenv'
 import bcrypt from 'bcrypt'
 import { decodeAccessToken, generateAccessToken } from '../middleware/token.js';
+import { Campus } from '../models/campus.model.js';
 
 
 config()
@@ -16,7 +17,19 @@ const module = 'User'
 //Metodo que devuelve todos los usuarios
 export const getUsers = async(req,res)=> {
         const {campus} = req.params
-        const result = await getModelByParameterManyWithJoin(User, "id_campus", campus,
+
+        const token = req.headers.authorization;    
+    
+        const dataToken = decodeAccessToken(token);
+    
+        let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
+        let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
+    
+        if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
+        
+    
+        
+        const result = await getModelByManyParameterWithJoinMany(User, {"id_campus":campus, "status":true},
             ['identification','name','lastname','username','phone','email','status','password','id_campus'],
             [
                 {model: Rol,required: true,attributes: ['name']},
@@ -27,6 +40,33 @@ export const getUsers = async(req,res)=> {
         } else {
             res.status(result.status).json({ message: result.message, error: result.error });
         }
+}
+
+export const getUsersInactive = async(req,res)=> {
+    const {campus} = req.params
+
+    const token = req.headers.authorization;    
+
+    const dataToken = decodeAccessToken(token);
+
+    let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
+    let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
+
+    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
+    
+
+    
+    const result = await getModelByManyParameterWithJoinMany(User, {"id_campus":campus, "status":false},
+        ['identification','name','lastname','username','phone','email','status','password','id_campus'],
+        [
+            {model: Rol,required: true,attributes: ['name']},
+        ]
+    );
+    if (result.success) {
+        res.status(result.status).json(result.model);
+    } else {
+        res.status(result.status).json({ message: result.message, error: result.error });
+    }
 }
 
 //Metodo que devuelve un usuario por su id
@@ -173,23 +213,28 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async(req,res)=>{
     const { campus, identification } = req.params;
 
-    const users = await getModelByParameterMany(User,"id_campus",campus)
-    let userFound = false;
-    let userSelected=null
-    users.model.forEach(element => {
-        if (element.identification == identification) {
-            userFound = true;
-            userSelected=element
-            return; // Salir del bucle forEach una vez que se encontró al usuario
-        }
-    });
+    const token = req.headers.authorization;    
+    
+    const dataToken = decodeAccessToken(token);
 
-    // Si no se encontró ningún usuario
-    if (!userFound) {
-        return res.status(result.status).json({ message: 'User not found', error: result.error });
-    }
+    let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
+    let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
 
-    const result = await deleteModel(User, userSelected.identification, namePrimaryKey);
+    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
+    
+
+    const user = await getModelByManyParameterWithJoinOne(User, {"id_campus":campus, "identification":identification})
+
+    if(!user.success) return res.status(404).json({message:"User not found"})
+
+    const campusUserToken = await getModelById(Campus, dataToken.campus)
+    const campusUser = await getModelById(Campus, campus)
+
+    if(campusUserToken.model.id_company != campusUser.model.id_company) return res.status(401).json({message:"Forbidden"})
+
+
+
+    const result = await updateModel(User,user.model.identification, {"status":false}, namePrimaryKey);
     if (result.success) {
         res.status(result.status).json({ message: 'User deleted' });
     } else {

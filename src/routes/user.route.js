@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getUsers, getUserById, createUser, updateUser, deleteUser, UserLogin} from '../controllers/user.controller.js'
+import {getUsers, getUserById, createUser, updateUser, deleteUser, UserLogin, getUsersInactive} from '../controllers/user.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 
@@ -17,7 +17,9 @@ const router = Router()
  *     tags:
  *       - Users    
  */
-router.get('/users/:campus',  getUsers)
+router.get('/users/:campus', validateToken , getUsers)
+
+router.get('/users/inactive/:campus', validateToken , getUsersInactive)
 
 
 /**
@@ -176,7 +178,7 @@ router.put('/users/:campus/:identification',   updateUser)
  *       404:
  *         description: Usuario no encontrado
  */
-router.delete('/users/:campus/:identification',  deleteUser)
+router.delete('/users/:campus/:identification', validateToken , deleteUser)
 
 
 /**
