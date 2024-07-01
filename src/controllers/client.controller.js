@@ -69,7 +69,7 @@ export const getClientById = async(req,res)=>{
 }
 
 export const getClientByDetails = async(req, res) => {
-    const { name, lastname, email, status, phone, id_city } = req.body; // Cambiado a req.body para un método POST
+    const { identification , name, lastname, email, status, phone, id_city } = req.body; // Cambiado a req.body para un método POST
     const {company} = req.params
     
     const token = req.headers.authorization;    
@@ -83,6 +83,7 @@ export const getClientByDetails = async(req, res) => {
     // Ajustar la consulta para buscar por name, lastname, o email
     let conditions={}
     conditions["id_company"] = company
+    if(identification) conditions["identification"] = identification
     if(name) conditions["name"] = name
     if(lastname) conditions["lastname"] = lastname
     if(email) conditions["email"] = email

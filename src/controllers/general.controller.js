@@ -77,7 +77,6 @@ export const getModelByParameterOne = async (Model, parameter, value) => {
 
 export const getModelByManyParameterWithJoinMany = async (Model, parameters, attributes = [], joins = []) => {
     try {
-        console.log("params", parameters);
         const model = await Model.findAll({            
             attributes: attributes.length > 0 ? attributes : undefined,
             include: joins.length > 0 ? joins : undefined,

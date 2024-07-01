@@ -3,6 +3,7 @@ import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la instancia de conexión a tu base de datos
 import {Rol} from "../models/rol.model.js"
 import {Campus} from "../models/campus.model.js"
+import { City } from './city.model.js';
 
 // Define el modelo de la tabla User
 const User = sequelize.define('User', {
@@ -53,6 +54,7 @@ const User = sequelize.define('User', {
 
 User.belongsTo(Rol, { foreignKey: 'id_rol' });
 User.belongsTo(Campus, { foreignKey: 'id_campus' });
+User.belongsTo(City, { foreignKey: 'id_city' });
 
 
 // Exporta el modelo User

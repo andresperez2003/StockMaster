@@ -1,11 +1,13 @@
 
 import { User } from '../models/user.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin, textCapitalized, modelAlreadyExist, hasPermissRol, hasPermissUser, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne} from "./general.controller.js"
+import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin, textCapitalized, modelAlreadyExist, hasPermissRol, hasPermissUser, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, searchOperation} from "./general.controller.js"
 import { Rol } from '../models/rol.model.js';
 import {config} from 'dotenv'
 import bcrypt from 'bcrypt'
 import { decodeAccessToken, generateAccessToken } from '../middleware/token.js';
 import { Campus } from '../models/campus.model.js';
+import { City } from '../models/city.model.js';
+import { Company } from '../models/company.model.js';
 
 
 config()
@@ -268,5 +270,37 @@ export const UserLogin = async(req,res)=>{
     return res.status(401).json({ message: "Not authorized" });
 }
 
+
+export const getUserByDetails = async(req, res) => {
+    const { name, identification, id_rol, lastname, email, username, status, phone, id_city } = req.body; // Cambiado a req.body para un método POST
+    
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module);
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module);
+
+    if (!rolCanGet && !userCanGet) {return res.status(403).json({ message: 'User does not have necessary permissions' })}
+
+    // Ajustar la consulta para buscar por name, lastname, o email
+    let conditions={}
+    conditions["id_campus"] = dataToken.campus
+    if(name) conditions["name"] = name
+    if(identification) conditions["identification"] = identification
+    if(username) conditions["username"] = username
+    if(lastname) conditions["lastname"] = lastname
+    if(email) conditions["email"] = email
+    if(id_rol) conditions["id_rol"] = id_rol
+    if(status != null) conditions["status"] = status
+    if(phone) conditions["phone"] = phone
+
+
+    const user = await getModelByManyParameterWithJoinMany(User, conditions, ["identification", "name", "lastname", "email", "phone", "username","status"], 
+        [{ model: Rol, required: true, attributes: ["id", "name"] }, { model: Campus, required: true, attributes: ["name", "address"] }]);
+    
+     console.log(user);   
+       return  !user.success ?  res.status(404).json({ message: 'User not found' }) :  res.status(200).json({ User: user.model });
+    
+};
 
 

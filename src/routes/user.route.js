@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getUsers, getUserById, createUser, updateUser, deleteUser, UserLogin, getUsersInactive} from '../controllers/user.controller.js'
+import {getUsers, getUserById, createUser, updateUser, deleteUser, UserLogin, getUsersInactive, getUserByDetails} from '../controllers/user.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 
@@ -96,6 +96,9 @@ router.get('/users/:campus/:identification',  getUserById)
  */
 router.post('/users', validateToken,  createUser)
 
+
+
+router.post('/users/details/:company',  validateToken , getUserByDetails)
 
 
 /**
