@@ -1,16 +1,27 @@
 
 import { Campus } from '../models/campus.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterManyWithJoin} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterManyWithJoin, hasPermissRol, hasPermissUser, searchOperation, addOperation, updateOperation, deleteOperation} from "./general.controller.js"
 import {City} from '../models/city.model.js'
 import { Department } from '../models/department.model.js';
 import { Country } from '../models/country.model.js';
 import {Company} from '../models/company.model.js'
+import { decodeAccessToken } from '../middleware/token.js';
 
 
+const module = "Campus"
 
 //Metodo que devuelve todos los campus
 export const getCampus = async(req,res)=> {
     const {company} = req.params
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
         const result = await getModelByParameterManyWithJoin(Campus,"id_company", company,
             ["id","name","address","phone","status","main_campus"],
             [
@@ -33,6 +44,15 @@ export const getCampus = async(req,res)=> {
 //Parametros: id
 export const getCampusById = async(req,res)=>{
     const { id } = req.params;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     const result = await getModelById(Campus, id);
     if (result.success) {
         res.status(result.status).json(result.model);
@@ -43,6 +63,13 @@ export const getCampusById = async(req,res)=>{
 
 export const getCampusByCompany = async(req,res)=>{
     const { company } = req.params;
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const result = await getModelByParameterMany(Campus,"id_company",company );
     if (result.success) {
         res.status(result.status).json(result.model);
@@ -72,7 +99,15 @@ export const createCampus =  async(req,res)=> {
     const { name, address, phone, id_city,status,main_campus, id_company } = req.body;
 
     if(!name || !address || !phone || !id_city || !status  || !id_company) return res.status(400).json({message:"Fill all fields"})
- 
+     const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
@@ -101,6 +136,14 @@ export const createCampus =  async(req,res)=> {
 export const updateCampus = async(req,res)=>{
     const { company, id } = req.params;
     let {name, address, phone, id_city,status,main_campus, id_company  } = req.body;
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const campus =  await getModelByParameterMany(Campus, "id_company", company);
     let campusSelected= null
@@ -148,6 +191,14 @@ export const updateCampus = async(req,res)=>{
 //Parametros: id
 export const deleteCampus = async(req,res)=>{
     const { id } = req.params;
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const result = await deleteModel(Campus, id);
     if (result.success) {
         res.status(result.status).json({ message: 'Campus deleted' });
@@ -161,7 +212,15 @@ export const deleteCampus = async(req,res)=>{
 export const deleteCampusByCompany = async (req, res) => {
     const { company, id } = req.params;
     const campus = await getModelByParameterMany(Campus, "id_company", company);
-    
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     let campusFound = false;
 
     for (const campusObj of campus.model) {

@@ -4,6 +4,7 @@ import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la in
 import { User } from './user.model.js';
 import { Client } from './client.model.js';
 import { statusBill } from './statusBill.model.js';
+import { Campus } from './campus.model.js';
 
 // Define el modelo de la tabla Bill
 const Bill = sequelize.define('Bill', {
@@ -43,6 +44,7 @@ const Bill = sequelize.define('Bill', {
 Bill.belongsTo(User, { foreignKey: 'id_user' });
 Bill.belongsTo(Client, { foreignKey: 'id_client' });
 Bill.belongsTo(statusBill, { foreignKey: 'status' });
+Bill.belongsTo(Campus, { foreignKey: 'id_campus' });
 
 // Exporta el modelo Bill
 export { Bill };

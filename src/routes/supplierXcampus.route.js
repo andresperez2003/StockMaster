@@ -6,19 +6,19 @@ const router = Router()
 
 
 
-router.get('/supplierxcampus',  getSupplierXCampus)
+router.get('/supplierxcampus/:campus', validateToken ,  getSupplierXCampus)
 
 
-router.get('/supplierxcampus/:id',  getSupplierXCampusById)
+router.get('/supplierxcampus/:campus/:id', validateToken , getSupplierXCampusById)
 
 
-router.post('/supplierxcampus',   createSupplierXCampus)
+router.post('/supplierxcampus',  validateToken ,  createSupplierXCampus)
 
 
-router.put('/supplierxcampus/:id',   updateSupplierXCampus)
+router.put('/supplierxcampus/:id', validateToken , updateSupplierXCampus)
 
 
-router.delete('/supplierxcampus/:id',  deleteSupplierXCampus)
+router.delete('/supplierxcampus/:campus/:id', validateToken  , deleteSupplierXCampus)
 
 
 

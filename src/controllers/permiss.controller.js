@@ -1,14 +1,24 @@
 
 import { Permiss } from '../models/permiss.model.js';
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterManyWithJoin, getModelByParameterMany} from "./general.controller.js"
-import { Operation } from '../models/operation.model.js';
-import { Module } from '../models/module.model.js';
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterManyWithJoin, getModelByParameterMany, searchOperation, addOperation, updateOperation, deleteOperation, hasPermissRol, hasPermissUser} from "./general.controller.js"
+import { decodeAccessToken } from "../middleware/token.js"
 
-
+const module = "Permiss"
 
 //Metodo que devuelve todos las partes de un producto
 export const getPermiss = async(req,res)=> {
         const {company} = req.params
+        const token = req.headers.authorization;   
+        
+        if(!token) return res.status(401).json({message:"Token is required"})
+        const dataToken = decodeAccessToken(token);
+     
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+
         const result = await getModelByParameterManyWithJoin(Permiss,"id_company",company,[/* "id" */],[
            /*  {model:Operation, required:true, attributes:["name"]},
             {model:Module, required:true, attributes:["name"]} */
@@ -24,6 +34,16 @@ export const getPermiss = async(req,res)=> {
 //Parametros: id
 export const getPermissById = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization; 
+    if(!token) return res.status(401).json({message:"Token is required"})   
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+
     const result = await getModelByParameterManyWithJoin(Permiss,"id_company", company,[/* "id" */],[
        /*  {model:Operation, required:true, attributes:["name"]},
         {model:Module, required:true, attributes:["name"]} */
@@ -43,8 +63,17 @@ export const getPermissById = async(req,res)=>{
 //Parametros: id_product, id_part, id_company
 export const createPermiss =  async(req,res)=> {
     const { id_module, id_operation, id_company } = req.body;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
 
-    if( !id_module || !id_operation || id_company) return res.status(400).json({message:"Fill all fields"})
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+
+    if( !id_module || !id_operation || !id_company) return res.status(400).json({message:"Fill all fields"})
     
 
     const existingPermiss = await Permiss.findOne({ where: { id_module: id_module, id_operation: id_operation, id_company:id_company  } });
@@ -67,6 +96,15 @@ export const createPermiss =  async(req,res)=> {
 export const updatePermiss = async(req,res)=>{
     const { company,id } = req.params;
     let { id_operation, id_module, id_company } = req.body;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
 
     const permisses =  await getModelByParameterMany(Permiss, "id_company", company);
     //price unit
@@ -112,6 +150,15 @@ export const updatePermiss = async(req,res)=>{
 //Parametros: id
 export const deletePermiss = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
 
     const permisses = await getModelByParameterMany(Permiss, "id_company", company)
 
@@ -121,7 +168,7 @@ export const deletePermiss = async(req,res)=>{
             const result = await deleteModel(Permiss, id);
             if (result.success) { 
                 permissFound= true;
-                return res.status(result.status).json({ message: 'Permimss deleted' });
+                return res.status(result.status).json({ message: 'Permiss deleted' });
             } else {
                 return res.status(result.status).json({ message: result.message, error: result?.error });
             }

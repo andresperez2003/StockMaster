@@ -1,7 +1,7 @@
 
 import { Client } from '../models/client.model.js'; // Importa el modelo Company que defines en otro archivo
-import {createModel, updateModel, deleteModel, getModelByParameterMany, hasPermissRol, hasPermissUser, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, modelAlreadyExist, getModelById, getModelByParameterOne, updateModelManyParameters} from "./general.controller.js"
-import { searchOperation, addOperation, deleOperation, updateOperation  } from "./general.controller.js"
+import {createModel, updateModel, deleteModel, getModelByParameterMany, hasPermissRol, hasPermissUser, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, modelAlreadyExist, getModelById, getModelByParameterOne, updateModelManyParameters, deleteOperation} from "./general.controller.js"
+import { searchOperation, addOperation, updateOperation  } from "./general.controller.js"
 import { decodeAccessToken } from "../middleware/token.js"
 import { City } from '../models/city.model.js';
 import { Company } from '../models/company.model.js';
@@ -12,7 +12,8 @@ const module = "Client"
 export const getClients = async(req,res)=> {
         const {company} = req.params
 
-        const token = req.headers.authorization;    
+        const token = req.headers.authorization;   
+        if(!token) return res.status(401).json({message:"Token is required"}) 
         const dataToken = decodeAccessToken(token);
 
         const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
@@ -31,7 +32,8 @@ export const getClients = async(req,res)=> {
 export const getClientsInactive = async(req,res)=> {
     const {company} = req.params
 
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
     const dataToken = decodeAccessToken(token);
 
     const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
@@ -53,6 +55,7 @@ export const getClientById = async(req,res)=>{
     const { company, identification } = req.params;
     
     const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
     const dataToken = decodeAccessToken(token);
 
     const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
@@ -72,7 +75,8 @@ export const getClientByDetails = async(req, res) => {
     const { identification , name, lastname, email, status, phone, id_city } = req.body; // Cambiado a req.body para un método POST
     const {company} = req.params
     
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
     const dataToken = decodeAccessToken(token);
 
     const rolCanGet = await hasPermissRol(dataToken, searchOperation, module);
@@ -105,11 +109,12 @@ export const getClientByDetails = async(req, res) => {
 //Parametros: identification, name, lastname, email, status, phone, id_city, id_company, address
 export const createClient =  async(req,res)=> {
     const { identification, name, lastname, email, status, phone, id_city, id_company, address } = req.body;
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
     const dataToken = decodeAccessToken(token);
 
-    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module);
-    const userCanGet = await hasPermissUser(dataToken, searchOperation, module);
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module);
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module);
 
     if (!rolCanGet && !userCanGet) {return res.status(403).json({ message: 'User does not have necessary permissions' })}
 
@@ -134,11 +139,12 @@ export const updateClient = async (req, res) => {
     let { name, lastname, email, status, id_city, phone, address } = req.body;
 
 
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization; 
+    if(!token) return res.status(401).json({message:"Token is required"})   
     const dataToken = decodeAccessToken(token);
 
-    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module);
-    const userCanGet = await hasPermissUser(dataToken, searchOperation, module);
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module);
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module);
 
     if (!rolCanGet && !userCanGet) {return res.status(403).json({ message: 'User does not have necessary permissions' })}
 
@@ -183,10 +189,11 @@ export const updateClient = async (req, res) => {
 export const deleteClient = async(req,res)=>{
     const { company, identification } = req.params;
     const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
     const dataToken = decodeAccessToken(token);
 
-    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module);
-    const userCanGet = await hasPermissUser(dataToken, searchOperation, module);
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module);
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module);
 
     if (!rolCanGet && !userCanGet) {return res.status(403).json({ message: 'User does not have necessary permissions' })}
 

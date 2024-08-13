@@ -157,7 +157,7 @@ router.post('/users/details/:company',  validateToken , getUserByDetails)
  *         description: Usuario creado
 
  */
-router.put('/users/:campus/:identification',   updateUser)
+router.put('/users/:identification', validateToken  , updateUser)
 
 
 

@@ -1,16 +1,25 @@
 
 import { json } from 'sequelize';
 import { Product } from '../models/product.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne, getModelByParameterManyWithJoin} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, getModelByParameterOne, getModelByParameterManyWithJoin, searchOperation, addOperation, updateOperation, deleteOperation, hasPermissRol, hasPermissUser} from "./general.controller.js"
 import { Category } from '../models/category.model.js';
+import { decodeAccessToken } from "../middleware/token.js"
 
+const module = "Product"
 
 
 //Metodo que devuelve todos los productos
 export const getProducts = async(req,res)=> {
         const {company} = req.params
+        const token = req.headers.authorization;    
+        const dataToken = decodeAccessToken(token);
+    
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
         const result = await getModelByParameterManyWithJoin(Product, "id_company", company,
-            ["id","name","price_sale","price_unit","description","photo","status","discount","id_company"],
+            ["id","name","price_sale","price_unit","description","photo","status","discount","id_company","can_sell"],
             [
                 {model: Category,required: true, attributes:['name']},
             ]
@@ -26,6 +35,13 @@ export const getProducts = async(req,res)=> {
 //Parametros: id
 export const getProductById = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const products = await getModelByParameterMany(Product, "id_company",company);
     for (const campusObj of products.model) {
         if (campusObj.id == id) {
@@ -41,16 +57,32 @@ export const getProductById = async(req,res)=>{
 //Parametros:  name, price, quantity, description, photo, status,discount, id_category, id_company
 export const createProduct =  async(req,res)=> {
     const { name, price_sale, price_unit, description, photo, status,discount, id_category, id_company, id_unit, can_sell } = req.body;
+
+    
     if(!name || !price_sale || !price_unit || !description || !photo || !discount || !id_category || !id_company || !id_unit) return res.status(400).json({message:"Fill all fields"})
+    
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
+    
+    console.log("name",nameCapitalize);
+
     const existingProduct = await Product.findOne({ where: { name: nameCapitalize, id_company:id_company } });
     
     if (existingProduct) {
         return res.status(400).json({ message: 'Cannot create a duplicate product' });
     }
+    
+    const result = await createModel(Product, { name:nameCapitalize, price_sale, description, price_unit, photo, status,discount, id_category, id_company, id_unit, can_sell });
 
-    const result = await createModel(Product, { nameCapitalize, price_sale, description, price_unit, photo, status,discount, id_category, id_company, id_unit, can_sell });
+    
     if (result.success) {
         res.status(result.status).json({ message: 'Product created' });
     } else {
@@ -66,6 +98,14 @@ export const updateProduct = async(req,res)=>{
     const { company, id } = req.params;
     let { name, price_unit, price_sale, description, photo, status,discount, id_category, id_company, id_unit, can_sell } = req.body;
 
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     const products =  await getModelByParameterMany(Product, "id_company", company);
     //price unit
 
@@ -78,23 +118,23 @@ export const updateProduct = async(req,res)=>{
         }
     });
 
-    const nameLower = productSelected.toLowerCase();
+    if(!productFound) return res.status(404).json({message:"Product not found"})
+    
+    const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
 
     if (nameCapitalize != productSelected.name) {
-        const existingModule = await Product.findOne({ where: { name: nameCapitalize, id_company:id_company } });
+        const existingModule = await Product.findOne({ where: { name: nameCapitalize, id_company:company } });
         if(existingModule) return res.status(400).json({ message: 'Cannot use a duplicate product name' });
     }
-
-
-    if(!productFound) return res.status(404).json({message:"Product not found"})
-
 
     if(products.success){
         if (!name){
             name = productSelected.name
+            
         }else{
             name = nameCapitalize
+
         }
         if (!price_sale) price_sale = productSelected.price_sale
         if (!price_unit) price_unit = productSelected.price_unit
@@ -112,6 +152,7 @@ export const updateProduct = async(req,res)=>{
         res.status(products.status).json({ message: products.message, error:products.error });
     }
 
+    
     const result = await updateModel(Product, id, { name, price_sale, price_unit,description, photo, status,discount, id_category, id_company, id_unit, can_sell});
     
     if (result.success) {
@@ -126,6 +167,13 @@ export const updateProduct = async(req,res)=>{
 //Parametros: id
 export const deleteProduct = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const products = await getModelByParameterMany(Product, "id_company", company)
     let productFound = false;
     for (const campusObj of products.model) {
@@ -152,10 +200,6 @@ export const getProductPerCategory = async(req,res)=>{
     const dicCategoryName ={}
     const dicCategory ={}
     let nuevoDicCategory = {};
-
-
-
-
 
     for(let campusObj of categories.model ){
         dicCategoryName[campusObj.id] = campusObj.name

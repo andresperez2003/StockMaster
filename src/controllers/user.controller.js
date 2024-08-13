@@ -1,6 +1,6 @@
 
 import { User } from '../models/user.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin, textCapitalized, modelAlreadyExist, hasPermissRol, hasPermissUser, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, searchOperation} from "./general.controller.js"
+import {getModelById, createModel, updateModel, getModelByParameterOne, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, getModelByParameterManyWithJoin, textCapitalized, modelAlreadyExist, hasPermissRol, hasPermissUser, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, searchOperation, addOperation, updateOperation, deleteOperation} from "./general.controller.js"
 import { Rol } from '../models/rol.model.js';
 import {config} from 'dotenv'
 import bcrypt from 'bcrypt'
@@ -14,6 +14,7 @@ config()
 
 const namePrimaryKey='identification'
 const module = 'User'
+const nameRol = "Administrador"
 
 
 //Metodo que devuelve todos los usuarios
@@ -21,13 +22,13 @@ export const getUsers = async(req,res)=> {
         const {campus} = req.params
 
         const token = req.headers.authorization;    
-    
+        if(!token) return res.status(401).json({message:"Token is required"})
         const dataToken = decodeAccessToken(token);
     
-        let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
-        let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
+        let rolHasPermiss = await hasPermissRol(dataToken, searchOperation, module)
+        let userHasPermiss = await hasPermissUser(dataToken, searchOperation, module)
     
-        if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
+        if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to search users"})}
         
     
         
@@ -48,13 +49,13 @@ export const getUsersInactive = async(req,res)=> {
     const {campus} = req.params
 
     const token = req.headers.authorization;    
-
+    if(!token) return res.status(401).json({message:"Token is required"})
     const dataToken = decodeAccessToken(token);
 
     let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
     let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
 
-    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
+    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to search a user"})}
     
 
     
@@ -74,6 +75,15 @@ export const getUsersInactive = async(req,res)=> {
 //Metodo que devuelve un usuario por su id
 export const getUserById = async (req, res) => {
     const { campus, identification } = req.params;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    let rolHasPermiss = await hasPermissRol(dataToken, searchOperation, module)
+    let userHasPermiss = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to search a user"})}
+    
     const result = await getModelByParameterManyWithJoin(User, "id_campus", campus,
         ['identification', 'name', 'lastname', 'username', 'phone', 'email', 'status', 'id_campus'],
         [
@@ -105,12 +115,12 @@ export const createUser =  async(req,res)=> {
     const { identification, name, lastname, username, status, photo, email, phone, id_rol, id_campus } = req.body;
     let {password} = req.body;
     const token = req.headers.authorization;    
-    
+    if(!token) return res.status(401).json({message:"Token is required"})
     const dataToken = decodeAccessToken(token);
 
-    let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
-    let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
-
+    let rolHasPermiss = await hasPermissRol(dataToken, addOperation, module)
+    let userHasPermiss = await hasPermissUser(dataToken, addOperation, module)
+    console.log(rolHasPermiss, userHasPermiss);
     if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
     
     
@@ -148,66 +158,73 @@ export const hashPassword = async(password)=>{
 //Metodo que actualiza un usuario
 //Parametros: identification, name, lastname, username, password, status, photo, email, phone, id_rol, id_company
 export const updateUser = async (req, res) => {
-    const { campus, identification } = req.params;
-    let { name, lastname, username, password, status, photo, email, phone, id_rol, id_company } = req.body;
+    const { identification } = req.params;
+    let { name, lastname, username, password, status, email, phone, id_rol, id_company } = req.body;
 
-    const users = await getModelByParameterMany(User, "id_campus", campus);
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    let rolHasPermiss = await hasPermissRol(dataToken, updateOperation, module)
+    let userHasPermiss = await hasPermissUser(dataToken, updateOperation, module)
+    let rolToken = await getModelById(Rol, dataToken.rol)
+
+    const user = await getModelByParameterOne(User, namePrimaryKey, identification)
+
+    if(name) name = textCapitalized(name)
+    if(lastname) lastname = textCapitalized(lastname)
+    if(password) password = await hashPassword(password)
+
+    if(!user.success) return res.status(404).json({message:"User not found"})
+    
+    if (!name || name == ''){name = user.model.name}
+    if (!lastname || lastname == ''){ lastname = user.model.lastname}
+    if (!username || username == '') username = user.model.username;
+    if (!password || password == '') password = user.model.password; 
+    if (status ==undefined) status = user.model.status;
+    if (!email || email == '') email = user.model.email; 
+    if (!phone || phone == '') phone = user.model.phone;
+    if (!id_rol) id_rol = user.model.id_rol;
+    if (!id_company || id_company == '') id_company = user.model.id_company;
+ 
+    console.log(userHasPermiss , rolHasPermiss);
+    if(identification != dataToken.id && rolToken.model.name == nameRol && (!userHasPermiss && !rolHasPermiss)){ return res.status(401).json({message:"Admin has no permission to update a user"})}
+    
+    if(identification != dataToken.id && rolToken.model.name != nameRol){ return res.status(401).json({message:"User has no permission to update a user"})}
+    
 
 
-    let userSelected= null
-    let userFound = false
-    users.model.forEach(element => {
-        if(element.identification == identification ){
-            userSelected = element
-        }
-    });
-
-    const nameLower = name.toLowerCase();
-    const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-
-    const lastnameLower = lastname.toLowerCase();
-    const lastnameCapitalize = lastnameLower.charAt(0).toUpperCase() + lastnameLower.slice(1);
-
-    if(userFound) return res.status(404).json({message:"User not found"})
-    if (users.success) {
-        // Update the variables only if they are not provided or empty
-        if (!name || name == ''){
-            name = userSelected.name;
-        } else{
-            name = nameCapitalize
-        }
-        if (!lastname || lastname == ''){
-            lastname = userSelected.lastname;
-        }else{
-            lastname = lastnameCapitalize
-        }
-        if (!username || username == '') username = userSelected.username;
-        if (!password || password == '') password = userSelected.password; 
-        if (status ==undefined) status = userSelected.status;
-        if (!photo || photo == '') photo = userSelected.photo;
-        if (!email || photo == '') email = userSelected.email; // Should this be email instead of photo?
-        if (!phone || photo == '') phone = userSelected.phone; // Should this be phone instead of photo?
-        if (!id_rol) id_rol = userSelected.id_rol;
-        if (!id_company || id_company == '') id_company = userSelected.id_company;
-    } else {
-        // If user retrieval fails, send an error response and return from the function
-        return res.status(users.status).json({ message: users.message, error: users.error });
+    //Posibles casos
+    //1. El usuario administrador quiere actualizar su información
+    //2. El usuario administrador quiere actualizar la información de otro usuario y tiene habilitada la opcion Editar User
+    //3. El usuario empleado quiere actualizar su información y tiene habilitada la opcion Editar User
+    if(( identification == dataToken.id && rolToken.model.name == nameRol) || (identification != dataToken.id && rolToken.model.name == nameRol && (!userHasPermiss && !rolHasPermiss)) || (identification == dataToken.id && rolToken.model.name != nameRol && (userHasPermiss || rolHasPermiss))){
+        const userPermiss = await updateCompleteUser(identification,name, lastname, username, password, status, email, phone, id_rol, id_company, namePrimaryKey);
+        return userPermiss.success ? res.status(userPermiss.status).json({ message: 'User updated' }) : res.status(userPermiss.status).json({ message: 'Something went wrong', error: userPermiss.error });
     }
 
-    // Update the user model
-
-    const saltRounds = 10; // Número de rondas de hashing (mayor es más seguro pero más lento)
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    password = hashedPassword
-    const result = await updateModel(User, identification, { name, lastname, username, password, status, photo, email, phone, id_rol, id_company },namePrimaryKey);
-
-    // Check the result of the update operation and send the appropriate response
-    if (result.success) {
-        res.status(result.status).json({ message: 'User updated' });
-    } else {
-        res.status(result.status).json({ message: 'Something went wrong', error: result.error });
-    }
+    //Usuario diferente a administrador desea actualizar su informamcion (No tiene permisos de Edit User)
+    const userWithoutPermiss = await updateOtherRol(identification,name, lastname, username, password, namePrimaryKey);
+    return userWithoutPermiss.success ? res.status(userWithoutPermiss.status).json({ message: 'User updated' }) : res.status(userWithoutPermiss.status).json({ message: 'Something went wrong', error: userWithoutPermiss.error });
+    
 };
+
+
+export const updateCompleteUser = async( identification ,name, lastname, username, password, status, email, phone, id_rol, id_company, namePrimaryKey )=>{
+    const result = await updateModel(User, identification, { name, lastname, username, password, status, email, phone, id_rol, id_company },namePrimaryKey);
+
+    return result.success ?  {success:true, status:result.status} : {success:false, error:result.error, status:result.status}
+    
+}
+
+export const updateOtherRol = async(identification,name, lastname, username, password, namePrimaryKey )=>{
+    const result = await updateModel(User, identification, { name, lastname, username, password },namePrimaryKey);
+
+    return result.success ?  {success:true, status:result.status} : {success:false, error:result.error, status:result.status}
+    
+}
+
+
 
 
 //Metodo que elimina una usuario
@@ -216,13 +233,13 @@ export const deleteUser = async(req,res)=>{
     const { campus, identification } = req.params;
 
     const token = req.headers.authorization;    
-    
+    if(!token) return res.status(401).json({message:"Token is required"})
     const dataToken = decodeAccessToken(token);
 
-    let rolHasPermiss = await hasPermissRol(dataToken, "Agregar", module)
-    let userHasPermiss = await hasPermissUser(dataToken, "Agregar", module)
+    let rolHasPermiss = await hasPermissRol(dataToken, deleteOperation, module)
+    let userHasPermiss = await hasPermissUser(dataToken, deleteOperation, module)
 
-    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to create a user"})}
+    if(!rolHasPermiss && !userHasPermiss){ return res.status(401).json({message:"User has no permission to delete a user"})}
     
 
     const user = await getModelByManyParameterWithJoinOne(User, {"id_campus":campus, "identification":identification})
@@ -237,11 +254,8 @@ export const deleteUser = async(req,res)=>{
 
 
     const result = await updateModel(User,user.model.identification, {"status":false}, namePrimaryKey);
-    if (result.success) {
-        res.status(result.status).json({ message: 'User deleted' });
-    } else {
-        res.status(result.status).json({ message: result.message, error: result?.error });
-    }
+    return result.success ? res.status(result.status).json({ message: 'User deleted' }) : res.status(result.status).json({ message: result.message, error: result?.error });
+    
 }
 
 export const getUserByEmail = async(email,req,res)=>{
@@ -271,8 +285,10 @@ export const UserLogin = async(req,res)=>{
 }
 
 
+
+
 export const getUserByDetails = async(req, res) => {
-    const { name, identification, id_rol, lastname, email, username, status, phone, id_city } = req.body; // Cambiado a req.body para un método POST
+    const { name, identification, id_rol, lastname, email, username, status, phone } = req.body; // Cambiado a req.body para un método POST
     
     const token = req.headers.authorization;    
     const dataToken = decodeAccessToken(token);
@@ -302,5 +318,6 @@ export const getUserByDetails = async(req, res) => {
        return  !user.success ?  res.status(404).json({ message: 'User not found' }) :  res.status(200).json({ User: user.model });
     
 };
+
 
 

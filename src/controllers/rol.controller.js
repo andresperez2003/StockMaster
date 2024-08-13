@@ -1,7 +1,7 @@
 
 import { json } from 'sequelize';
 import { Rol } from '../models/rol.model.js'; // Importa el modelo Company que defines en otro archivo
-import {createModel, updateModel, deleteModel, getModelByParameterMany, getModelByManyParameters, searchOperation, textCapitalized, hasPermissRol, hasPermissUser, modelAlreadyExist, addOperation, getModelByParameterOne, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, getModelById} from "./general.controller.js"
+import {createModel, updateModel, deleteModel, getModelByParameterMany, getModelByManyParameters, searchOperation, textCapitalized, hasPermissRol, hasPermissUser, modelAlreadyExist, addOperation, getModelByParameterOne, getModelByManyParameterWithJoinMany, getModelByManyParameterWithJoinOne, getModelById, updateOperation, deleteOperation} from "./general.controller.js"
 import { decodeAccessToken } from '../middleware/token.js';
 import { User } from '../models/user.model.js';
 import { getCampusByIdMethod } from './campus.controller.js';
@@ -14,7 +14,8 @@ const module = "Rol"
 export const getRoles = async(req,res)=> {
         const {company} = req.params
 
-        const token = req.headers.authorization;    
+        const token = req.headers.authorization; 
+        if(!token) return res.status(401).json({message:"Token is required"})   
         const dataToken = decodeAccessToken(token);
 
         const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
@@ -34,6 +35,7 @@ export const getRolByParameters = async(req,res)=> {
     const {name, company} = req.params
 
     const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
     const dataToken = decodeAccessToken(token);
 
     const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
@@ -55,7 +57,8 @@ export const getRolByParameters = async(req,res)=> {
 export const getRolById = async(req,res)=>{
     const { id,company } = req.params;
 
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
     const dataToken = decodeAccessToken(token);
 
     const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
@@ -85,7 +88,8 @@ export const createRol =  async(req,res)=> {
     const{ description, id_company } = req.body;
     let { name } = req.body;
 
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
     const dataToken = decodeAccessToken(token);
 
     const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
@@ -115,11 +119,12 @@ export const updateRol = async(req,res)=>{
     const { company, id } = req.params;
     let { name, description, id_company } = req.body;
 
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization; 
+    if(!token) return res.status(401).json({message:"Token is required"})   
     const dataToken = decodeAccessToken(token);
 
-    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
-    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
 
     if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
@@ -159,18 +164,20 @@ export const updateRol = async(req,res)=>{
 export const deleteRol = async(req,res)=>{
     const { company, id } = req.params;
 
-    const token = req.headers.authorization;    
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
     const dataToken = decodeAccessToken(token);
 
-    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
-    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
 
     if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const campus = await getCampusByIdMethod(dataToken.campus)
     const rol = await getModelById(Rol, id)
-
-    if(rol.id_company != campus.id_company ) return res.status(401).json({message:"Forbidden"})
+    
+    
+    if(rol.model.id_company != campus.id_company ) return res.status(401).json({message:"Forbidden"})
 
     const users = await getModelByManyParameterWithJoinMany(User, {"id_rol":id})
     const length = users.model.length

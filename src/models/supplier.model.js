@@ -1,6 +1,7 @@
 // Importa Sequelize y la instancia de conexión a la base de datos
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js'; // Asegúrate de que 'sequelize' sea la instancia de conexión a tu base de datos
+import { Company } from './company.model.js';
 
 // Define el modelo de la tabla Supplier
 const Supplier = sequelize.define('Supplier', {
@@ -24,6 +25,8 @@ const Supplier = sequelize.define('Supplier', {
   tableName: 'supplier', // Nombre de la tabla en la base de datos
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
+
+Supplier.belongsTo(Company, { foreignKey: 'id_company' });
 
 // Exporta el modelo Supplier
 export { Supplier };

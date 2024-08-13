@@ -1,14 +1,35 @@
 
+import { decodeAccessToken } from '../middleware/token.js';
 import { Bill } from '../models/bill.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany} from "./general.controller.js"
+import { Campus } from '../models/campus.model.js';
+import { Client } from '../models/client.model.js';
+import { Company } from '../models/company.model.js';
+import { statusBill } from '../models/statusBill.model.js';
+import { User } from '../models/user.model.js';
+import {createModel, updateModel, getModelByParameterMany, getModelByManyParameterWithJoinMany, getModelByManyParameters, hasPermissRol, hasPermissUser, searchOperation, addOperation, updateOperation, deleteOperation, getModelByManyParameterWithJoinOne} from "./general.controller.js"
 
 
-
+const module = "Bill"
 
 //Metodo que devuelve todos las categorias
 export const getBills = async(req,res)=> {
-        const {campus} = req.params
-        const result = await getModelByParameterMany(Bill,"id_campus",campus);
+        const {campus} = req.params;
+        const token = req.headers.authorization;    
+        if(!token) return res.status(401).json({message:"Token is required"})
+        const dataToken = decodeAccessToken(token);
+    
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+    
+        const result = await getModelByManyParameterWithJoinMany(Bill, {"id_campus":campus}, ["id","date_bill"],[
+            {model: statusBill, attributes:["name"]},
+            { model:User },
+            {model:Client},
+            {model:Campus, attributes:["id","name","id_company"]}
+        ]);
+
         if (result.success) {
             res.status(result.status).json(result.model);
         } else {
@@ -22,14 +43,27 @@ export const getBills = async(req,res)=> {
 //Arreglar este metodo
 export const getBillsById = async(req,res)=>{
     const { campus, id } = req.params;
-    const bills = await getModelByParameterMany(Bill,"id_campus", campus);
-    for (const campusObj of bills.model) {
-        if (campusObj.id == id) {
-            return res.status(bills.status).json({Bill:campusObj});
-        }
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+    const result = await getModelByManyParameterWithJoinOne(Bill,{"id_campus":campus, "id":id}, ["id","date_bill"], [
+        {model: statusBill, attributes:["name"]},
+        { model:User },
+        {model:Client},
+        {model:Campus, attributes:["id","name"], include:{model:Company, attributes:["nit","name"]}}
+    ]);
+
+    if (result.success) {  
+        return res.status(result.status).json(result.model);
+    } else {
+        return res.status(result.status).json({ message: result.message, error: result.error });
     }
-    return res.status(bills.status).json({ message: 'Bill not found', error: bills.error });
-    
 }
 
 
@@ -37,6 +71,15 @@ export const getBillsById = async(req,res)=>{
 //Parametros: name, description
 export const createBill =  async(req,res)=> {
     const { id, date_bill, id_campus, status, id_user, id_client } = req.body;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     if( !id || !date_bill || !id_campus || !status || !id_user || !id_client ) return res.status(400).json({message:"Fill all fields"})
 
     const existingBill = await Bill.findOne({ where: { date_bill: date_bill, id_campus:id_campus, id_user:id_user,id_client:id_client  } });
@@ -58,6 +101,14 @@ export const createBill =  async(req,res)=> {
 export const updateBill = async(req,res)=>{
     let { campus, id_bill } = req.params;
     let { id, date_bill, id_company, status, id_user, id_client } = req.body;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const bills =  await getModelByParameterMany(Bill, "id_campus", campus);
 
@@ -100,23 +151,20 @@ export const updateBill = async(req,res)=>{
 //Parametros: id
 export const deleteBill = async(req,res)=>{
     const { campus, id } = req.params;
-    const bills = await getModelByParameterMany(Bill, "id_campus", campus);
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+    const result = await getModelByManyParameters(Bill, {"id_campus":campus, "id":id});
     
-    let billFound = false;
-
-    for (const campusObj of bills.model) {
-        if (campusObj.id == id) {
-            const result = await deleteModel(Bill, id);
-            if (result.success) { 
-                billFound = true;
-                return res.status(result.status).json({ message: 'Bill deleted' });
-            } else {
-                return res.status(result.status).json({ message: result.message, error: result?.error });
-            }
-        }
-    }
-
-    if (!billFound) {
-        return res.status(404).json({ message: 'Bill not found' });
+    if (result.success) {
+        res.status(result.status).json({ message: 'Bill deleted' });
+    } else {
+        res.status(result.status).json({ message: 'Something went wrong', error: result.error });
     }
 }

@@ -4,7 +4,7 @@ import { getRolXPermissByRolAndCompany } from './rolXpermiss.controller.js';
 import { getUserXPermissByUserAndCompany } from './userXpermiss.controller.js';
 
 export const addOperation = "Agregar"
-export const deleOperation = "Eliminar"
+export const deleteOperation = "Eliminar"
 export const updateOperation = "Editar"
 export const searchOperation = "Buscar"
 

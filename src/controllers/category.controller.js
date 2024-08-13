@@ -1,13 +1,23 @@
 
 import { Category } from '../models/category.model.js'; // Importa el modelo Company que defines en otro archivo
-import {createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
+import {createModel, updateModel, deleteModel, getModelByParameterMany, searchOperation, addOperation, updateOperation, deleteOperation, hasPermissRol, hasPermissUser} from "./general.controller.js"
+import { decodeAccessToken } from "../middleware/token.js"
 
-
+const module = "Category"
 
 
 //Metodo que devuelve todos las categorias
 export const getCategories = async(req,res)=> {
         const {company} = req.params
+        const token = req.headers.authorization;  
+        if(!token) return res.status(401).json({message:"Token is required"})  
+        const dataToken = decodeAccessToken(token);
+    
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
         const result = await getModelByParameterMany(Category,"id_company",company);
         if (result.success) {
             res.status(result.status).json(result.model);
@@ -20,6 +30,14 @@ export const getCategories = async(req,res)=> {
 //Parametros: id
 export const getCategoryById = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const result = await getModelByParameterMany(Category, "id_company", company);
 
 
@@ -41,6 +59,14 @@ export const getCategoryById = async(req,res)=>{
 //Parametros: name, description
 export const createCategory =  async(req,res)=> {
     const { name, description, id_company } = req.body;
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     if(!name) return res.status(400).json({message:"Fill all fields"})
 
@@ -53,7 +79,7 @@ export const createCategory =  async(req,res)=> {
         return res.status(400).json({ message: 'Cannot create a duplicate category' });
     }
     
-        const result = await createModel(Category, { nameCapitalize, description, id_company });
+        const result = await createModel(Category, { name:nameCapitalize, description, id_company });
 
 
 
@@ -70,6 +96,14 @@ export const createCategory =  async(req,res)=> {
 //Parametros: name, description
 export const updateCategory = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     let { name, description,id_company } = req.body;
 
     const nameLower = name.toLowerCase();
@@ -119,6 +153,15 @@ export const updateCategory = async(req,res)=>{
 //Parametros: id
 export const deleteCategory = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+    
     const categories = await getModelByParameterMany(Category, "id_company", company)
     let categoryFound = false;
     for (const campusObj of categories.model) {

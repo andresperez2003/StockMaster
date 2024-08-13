@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getOperations, getOperationById, updateOperation, createOperation, deleteOperation} from '../controllers/operation.controller.js'
+import {getOperations, getOperationById, createOperation, updateOperations, deleteOperations} from '../controllers/operation.controller.js'
 import {validateToken} from '../middleware/verifyToken.js'
 
 const router = Router()
@@ -16,10 +16,10 @@ router.get('/operations/:id',  getOperationById)
 router.post('/operations',   createOperation)
 
 
-router.put('/operations/:id',   updateOperation)
+router.put('/operations/:id',   updateOperations)
 
 
-router.delete('/operations/:id',  deleteOperation)
+router.delete('/operations/:id',  deleteOperations)
 
 
 

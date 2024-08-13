@@ -1,13 +1,24 @@
 
+import { decodeAccessToken } from '../middleware/token.js';
 import { statusBill } from '../models/statusBill.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany, searchOperation, hasPermissRol, hasPermissUser, addOperation, updateOperation, deleteOperation} from "./general.controller.js"
 
 
 
+const module = "StatusBill"
 
 //Metodo que devuelve todos los estados de factura
 export const getStatusBill = async(req,res)=> {
         const {company} = req.params
+        const token = req.headers.authorization;  
+        if(!token) return res.status(401).json({message:"Token is required"})  
+        const dataToken = decodeAccessToken(token);
+    
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
         const result = await getModelByParameterMany(statusBill, "id_company", company  );
         if (result.success) {
             res.status(result.status).json(result.model);
@@ -18,6 +29,14 @@ export const getStatusBill = async(req,res)=> {
 
 export const getStatusBillById = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;
+    if(!token) return res.status(401).json({message:"Token is required"})    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const statusBills = await getModelByParameterMany(statusBill, "id_company",company);
     for (const campusObj of statusBills.model) {
         if (campusObj.id == id) {
@@ -30,6 +49,14 @@ export const getStatusBillById = async(req,res)=>{
 
 export const getStatusBillByName = async(req,res)=>{
     const { company, name } = req.params;
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const statusBills = await getModelByParameterMany(statusBill, "id_company",company);
     for (const campusObj of statusBills.model) {
         if (campusObj.name == name) {
@@ -45,6 +72,14 @@ export const getStatusBillByName = async(req,res)=>{
 //Parametros: name, description
 export const createStatusBill =  async(req,res)=> {
     const { name, id_company } = req.body;
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     if(!name || !id_company) return res.status(400).json({message:"Fill all fields"})
 
     const nameLower = name.toLowerCase();
@@ -71,6 +106,14 @@ export const createStatusBill =  async(req,res)=> {
 export const updateStatusBill = async(req,res)=>{
     const { company,id } = req.params;
     let { name, id_company } = req.body;
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const statusBills =  await getModelByParameterMany(statusBill, "id_company", company);
 
@@ -121,6 +164,14 @@ export const updateStatusBill = async(req,res)=>{
 //Parametros: id
 export const deleteStatusBill = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const statusBills = await getModelByParameterMany(statusBill, "id_company", company)
     let statusBillFound = false;
     for (const campusObj of statusBills.model) {

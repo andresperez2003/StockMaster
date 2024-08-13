@@ -6,22 +6,22 @@ const router = Router()
 
 
 
-router.get('/unit/:company',  getUnit)
+router.get('/unit/:company', validateToken ,   getUnit)
 
 
-router.get('/unit/:company/:id',  getUnitById)
+router.get('/unit/:company/:id', validateToken , getUnitById)
 
 
-router.get('/unit/name/:company/:name',  getUnitByName)
+router.get('/unit/name/:company/:name', validateToken ,  getUnitByName)
 
 
-router.post('/unit',  createUnit)
+router.post('/unit', validateToken , createUnit)
 
 
-router.put('/unit/:company/:id',   updateUnit)
+router.put('/unit/:company/:id', validateToken ,  updateUnit)
 
 
-router.delete('/unit/:company/:id',   deleteUnit)
+router.delete('/unit/:company/:id', validateToken  , deleteUnit)
 
 
 

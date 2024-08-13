@@ -54,7 +54,6 @@ const User = sequelize.define('User', {
 
 User.belongsTo(Rol, { foreignKey: 'id_rol' });
 User.belongsTo(Campus, { foreignKey: 'id_campus' });
-User.belongsTo(City, { foreignKey: 'id_city' });
 
 
 // Exporta el modelo User

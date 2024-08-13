@@ -26,8 +26,8 @@ const ProductXProduct = sequelize.define('ProductXProduct', {
   timestamps: false // Desactiva la gestión automática de marcas de tiempo
 });
 
-ProductXProduct.belongsTo(Product, { foreignKey: 'id_product' });
-ProductXProduct.belongsTo(Product, { foreignKey: 'id_part' });
+ProductXProduct.belongsTo(Product, { foreignKey: 'id_product', as: 'Product' });
+ProductXProduct.belongsTo(Product, { foreignKey: 'id_part', as: 'Part' });
 ProductXProduct.belongsTo(Company, { foreignKey: 'id_company' });
 
 

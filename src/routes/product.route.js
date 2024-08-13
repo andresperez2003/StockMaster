@@ -16,7 +16,7 @@ const router = Router()
  *     tags:
  *       - Products    
  */
-router.get('/products/:company',  getProducts)
+router.get('/products/:company', validateToken , getProducts)
 
 
 /**
@@ -39,10 +39,10 @@ router.get('/products/:company',  getProducts)
  *       404:
  *         description: Producto no encontrado
  */
-router.get('/products/:company/:id',  getProductById)
+router.get('/products/:company/:id', validateToken , getProductById)
 
 
-router.get('/menu/:company', validateToken,  getProductPerCategory)
+router.get('/menu/:company',  getProductPerCategory)
 
 
 /**
@@ -93,7 +93,7 @@ router.get('/menu/:company', validateToken,  getProductPerCategory)
  *         description: Usuario editado
 
  */
-router.post('/products',   createProduct)
+router.post('/products', validateToken , createProduct)
 
 
 
@@ -150,7 +150,7 @@ router.post('/products',   createProduct)
  *         description: Producto creado
 
  */
-router.put('/products/:company/:id',  updateProduct)
+router.put('/products/:company/:id', validateToken , updateProduct)
 
 
 
@@ -174,6 +174,6 @@ router.put('/products/:company/:id',  updateProduct)
  *       404:
  *         description: Producto no encontrado
  */
-router.delete('/products/:company/:id',   deleteProduct)
+router.delete('/products/:company/:id', validateToken , deleteProduct)
 
 export default router

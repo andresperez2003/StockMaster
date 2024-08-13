@@ -1,13 +1,25 @@
 
+import { decodeAccessToken } from '../middleware/token.js';
 import { Department } from '../models/department.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany, hasPermissRol, hasPermissUser, searchOperation, addOperation, updateOperation, deleteOperation} from "./general.controller.js"
 
-
+const module = "Department"
 
 
 //Metodo que devuelve todos los departamentos
 export const getDepartment = async(req,res)=> {
         const result = await getAllModels(Department);
+        const token = req.headers.authorization;   
+        
+        if(!token) return res.status(401).json({message:"Token is required"})
+        const dataToken = decodeAccessToken(token);
+     
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+
         if (result.success) {
             res.status(result.status).json(result.models);
         } else {
@@ -19,6 +31,16 @@ export const getDepartment = async(req,res)=> {
 //Parametros: id
 export const getDepartmentById = async(req,res)=>{
     const { id } = req.params;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     const result = await getModelById(Department, id);
     if (result.success) {
         res.status(result.status).json(result.model);
@@ -32,6 +54,15 @@ export const getDepartmentById = async(req,res)=>{
 //Parametros: name, id_country
 export const createDepartment =  async(req,res)=> {
     const { name, id_country } = req.body;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
@@ -40,7 +71,7 @@ export const createDepartment =  async(req,res)=> {
         return res.status(400).json({ message: 'Cannot create a duplicate department' });
     }
 
-    const result = await createModel(Department, { nameCapitalize, id_country });
+    const result = await createModel(Department, { name:nameCapitalize, id_country });
     if (result.success) {
         res.status(result.status).json({ message: 'Department created' });
     } else {
@@ -53,8 +84,18 @@ export const createDepartment =  async(req,res)=> {
 //Metodo que actualiza un pais
 //Parametros: id, name, id_country
 export const updateDepartment = async(req,res)=>{
-        const { id } = req.params;
-    const { name, id_country } = req.body;
+    const { id } = req.params;
+    let { name, id_country } = req.body;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
 
     const department = await getModelById(Department,id)
 
@@ -92,6 +133,16 @@ export const updateDepartment = async(req,res)=>{
 //Parametros: id
 export const deleteDepartment = async(req,res)=>{
     const { id } = req.params;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     const result = await deleteModel(Department, id);
     if (result.success) {
         res.status(result.status).json({ message: 'Department deleted' });
@@ -105,6 +156,16 @@ export const deleteDepartment = async(req,res)=>{
 //Parametros: name
 export const getDepartmentByName = async(req,res)=>{
     const { name } = req.params;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
     const result = await getModelByParameterOne(Department,"name", nameCapitalize);
@@ -119,6 +180,15 @@ export const getDepartmentByName = async(req,res)=>{
 //Parametros: id_country
 export const getDepartmentByCountry = async(req,res)=>{
     const { country } = req.params;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
 
     const result = await getModelByParameterMany(Department,"id_country", country);

@@ -1,13 +1,26 @@
 
 import { Operation } from '../models/operation.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, searchOperation, addOperation, updateOperation, deleteOperation, hasPermissRol, hasPermissUser} from "./general.controller.js"
+import { decodeAccessToken } from "../middleware/token.js"
 
-
+const module = "Operation"
 
 
 //Metodo que devuelve todos las operaciones
 export const getOperations = async(req,res)=> {
         const result = await getAllModels(Operation);
+        const token = req.headers.authorization;   
+        
+        if(!token) return res.status(401).json({message:"Token is required"})
+        const dataToken = decodeAccessToken(token);
+     
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+
+
         if (result.success) {
             res.status(result.status).json(result.models);
         } else {
@@ -18,7 +31,17 @@ export const getOperations = async(req,res)=> {
 //Metodo que trae una operacion
 //Parametros: id
 export const getOperationById = async(req,res)=>{
-    const { id } = req.params;
+    const { id } = req.params;        const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+    
     const result = await getModelById(Operation, id);
 
 
@@ -34,19 +57,29 @@ export const getOperationById = async(req,res)=>{
 //Parametros: name
 export const createOperation =  async(req,res)=> {
     const { name } = req.body;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     if(!name) return res.status(400).json({message:"Fill all fields"})
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
-
+    console.log(nameCapitalize);
+    
     const existingOperation = await Operation.findOne({ where: { name: nameCapitalize } });
     if (existingOperation) {
         return res.status(400).json({ message: 'Cannot create a duplicate operation' });
     }
 
 
-    const result = await createModel(Operation, { nameCapitalize });
+    const result = await createModel(Operation, { name:nameCapitalize });
     if (result.success) {
         res.status(result.status).json({ message: 'Operation created' });
     } else {
@@ -58,9 +91,19 @@ export const createOperation =  async(req,res)=> {
  
 //Metodo que actualiza una categoria
 //Parametros: name, description
-export const updateOperation = async(req,res)=>{
+export const updateOperations = async(req,res)=>{
     const { id } = req.params;
     let { name } = req.body;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
@@ -92,8 +135,18 @@ export const updateOperation = async(req,res)=>{
 
 //Metodo que elimina una categoria
 //Parametros: id
-export const deleteOperation = async(req,res)=>{
+export const deleteOperations = async(req,res)=>{
     const { id } = req.params;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
     const result = await deleteModel(Operation, id);
     if (result.success) {
         res.status(result.status).json({ message: 'Operation deleted' });

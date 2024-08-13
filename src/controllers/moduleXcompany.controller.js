@@ -1,14 +1,24 @@
 
 import { ModuleXCompany } from '../models/moduleXcompany.model.js';
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getAllModelsWithJoin, getModelByIdWithJoin, getModelByParameterMany, searchOperation, addOperation, updateOperation, deleteOperation, hasPermissRol, hasPermissUser} from "./general.controller.js"
 import { Operation } from '../models/operation.model.js';
 import { Module } from '../models/module.model.js';
+import { decodeAccessToken } from '../middleware/token.js';
 
 
-
+const module = "ModulexCompany"
 //Metodo que devuelve todos las partes de un producto
 export const getModuleXCompany = async(req,res)=> {
         const {company} = req.params
+        const token = req.headers.authorization;  
+        if(!token) return res.status(401).json({message:"Token is required"})  
+        const dataToken = decodeAccessToken(token);
+    
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+        
         const result = await getModelByParameterMany(ModuleXCompany,"id_company",company)
         if (result.success) {
             res.status(result.status).json(result.model);
@@ -22,10 +32,19 @@ export const getModuleXCompany = async(req,res)=> {
 export const getModuleXCompanyById = async(req,res)=>{
     const { company,id } = req.params;
     const result = await getModelByParameterMany(ModuleXCompany,"id_company", company);
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
 
     let moduleXCompanyFound=false
     let moduleXCompanySelected = null
+    
     result.model.forEach(element => {
         if(element.id == id){
             moduleXCompanySelected=element
@@ -44,7 +63,15 @@ export const createModuleXCompany =  async(req,res)=> {
     const { id_module, id_company } = req.body;
 
     if( !id_module || !id_company) return res.status(400).json({message:"Fill all fields"})
-    
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
 
     const existingModuleXCompany = await ModuleXCompany.findOne({ where: { id_module: id_module, id_company: id_company  } });
     if (existingModuleXCompany) {
@@ -66,6 +93,14 @@ export const createModuleXCompany =  async(req,res)=> {
 export const updateModuleXCompany = async(req,res)=>{
     const { company,id } = req.params;
     let {  id_module, id_company } = req.body;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const modulexcampus =  await getModelByParameterMany(ModuleXCompany, "id_company", company);
 
@@ -110,24 +145,32 @@ export const updateModuleXCompany = async(req,res)=>{
 //Parametros: id
 export const deleteModuleXCompany = async(req,res)=>{
     const { company,id } = req.params;
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
 
-    const modulexcampus =  await getModelByParameterMany(ModuleXCompany, "id_company", company);
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation  , module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
+    const modulexcompany =  await getModelByParameterMany(ModuleXCompany, "id_company", company);
 
 
     let moduleXCompanyFound=false
     let moduleXCompanyId = null
-    modulexcampus.model.forEach(element => {
+    modulexcompany.model.forEach(element => {
         if(element.id == id){
             moduleXCompanyId=element.id
             moduleXCompanyFound=true        
         }
     });
 
-    if(!moduleXCompanyFound) return res.status(404).json({message:"Rol not found"})
+    if(!moduleXCompanyFound) return res.status(404).json({message:"ModulexCompany not found"})
 
     const result = await deleteModel(ModuleXCompany, moduleXCompanyId);
     if (result.success) {
-        res.status(result.status).json({ message: 'modulexcampus deleted' });
+        res.status(result.status).json({ message: 'ModuleXCompany deleted' });
     } else {
         res.status(result.status).json({ message: result.message, error: result?.error });
     }

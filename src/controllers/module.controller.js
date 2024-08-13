@@ -1,13 +1,24 @@
 
 import { Module } from '../models/module.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterMany, searchOperation, hasPermissRol, hasPermissUser, addOperation, updateOperation, deleteOperation} from "./general.controller.js"
+import { decodeAccessToken } from "../middleware/token.js"
 
-
-
+const module = "Module"
 
 //Metodo que devuelve todos low modulow
 export const getModules = async(req,res)=> {
         const result = await getAllModels(Module);
+
+        const token = req.headers.authorization;   
+        
+        if(!token) return res.status(401).json({message:"Token is required"})
+        const dataToken = decodeAccessToken(token);
+     
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+
         if (result.success) {
             res.status(result.status).json(result.models);
         } else {
@@ -20,6 +31,15 @@ export const getModules = async(req,res)=> {
 export const getModuleById = async(req,res)=>{
     const { id } = req.params;
     const result = await getModelById(Module, id);
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
 
     if (result.success) {
@@ -34,6 +54,15 @@ export const getModuleById = async(req,res)=>{
 //Parametros: name
 export const createModule =  async(req,res)=> {
     let { name, description } = req.body;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     if(!name) return res.status(400).json({message:"Fill all fields"})
     if(!description) description =""
@@ -62,22 +91,31 @@ export const createModule =  async(req,res)=> {
 export const updateModule = async(req,res)=>{
     const { id } = req.params;
     let { name,description } = req.body;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
 
-    const module = await getModelById(Module,id)
+    const findModule = await getModelById(Module,id)
 
     if(!name){
-        name = module.model.name
+        name = findModule.model.name
     }else{
         name = nameCapitalize
     }
-    if(!description) description = module.model.description
+    if(!description) description = findModule.model.description
 
 
-    if (nameCapitalize != module.name) {
+    if (nameCapitalize != findModule.name) {
         const existingModule = await Module.findOne({ where: { name: nameCapitalize } });
         if(existingModule) return res.status(400).json({ message: 'Cannot create a duplicate module' });
     }
@@ -96,6 +134,15 @@ export const updateModule = async(req,res)=>{
 //Parametros: id
 export const deleteModule = async(req,res)=>{
     const { id } = req.params;
+    const token = req.headers.authorization;   
+        
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+ 
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const result = await deleteModel(Module, id);
     if (result.success) {
         res.status(result.status).json({ message: 'Module deleted' });

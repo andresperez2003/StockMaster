@@ -1,13 +1,22 @@
 
+import { decodeAccessToken } from '../middleware/token.js';
 import { Unit } from '../models/unit.model.js'; // Importa el modelo Company que defines en otro archivo
-import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany} from "./general.controller.js"
+import {getAllModels, getModelById, createModel, updateModel, deleteModel, getModelByParameterOne, getModelByParameterMany, hasPermissRol, hasPermissUser, searchOperation, addOperation, updateOperation, deleteOperation} from "./general.controller.js"
 
-
+const module = "Unit"
 
 
 //Metodo que devuelve todos los estados de factura
 export const getUnit = async(req,res)=> {
         const {company} = req.params
+        const token = req.headers.authorization;   
+        if(!token) return res.status(401).json({message:"Token is required"}) 
+        const dataToken = decodeAccessToken(token);
+    
+        const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+        const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+    
+        if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
         const result = await getModelByParameterMany(Unit, "id_company", company  );
         if (result.success) {
             res.status(result.status).json(result.model);
@@ -18,6 +27,14 @@ export const getUnit = async(req,res)=> {
 
 export const getUnitById = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;  
+    if(!token) return res.status(401).json({message:"Token is required"})  
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const units = await getModelByParameterMany(Unit, "id_company",company);
     for (const campusObj of units.model) {
         if (campusObj.id == id) {
@@ -30,6 +47,13 @@ export const getUnitById = async(req,res)=>{
 
 export const getUnitByName = async(req,res)=>{
     const { company, name } = req.params;
+    const token = req.headers.authorization;    
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, searchOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, searchOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
     const units = await getModelByParameterMany(Unit, "id_company",company);
     for (const campusObj of units.model) {
         if (campusObj.name == name) {
@@ -45,7 +69,16 @@ export const getUnitByName = async(req,res)=>{
 //Parametros: name, description
 export const createUnit =  async(req,res)=> {
     const { name, id_company } = req.body;
+    
     if(!name || !id_company) return res.status(400).json({message:"Fill all fields"})
+    const token = req.headers.authorization;    
+    if(!token) return res.status(401).json({message:"Token is required"})
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, addOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, addOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const nameLower = name.toLowerCase();
     const nameCapitalize = nameLower.charAt(0).toUpperCase() + nameLower.slice(1);
@@ -57,7 +90,7 @@ export const createUnit =  async(req,res)=> {
     }
 
 
-    const result = await createModel(unit, { name:nameCapitalize, id_company });
+    const result = await createModel(Unit, { name:nameCapitalize, id_company });
     if (result.success) {
         res.status(result.status).json({ message: 'Unit created' });
     } else {
@@ -72,6 +105,14 @@ export const createUnit =  async(req,res)=> {
 export const updateUnit = async(req,res)=>{
     const { company,id } = req.params;
     let { name, id_company } = req.body;
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, updateOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, updateOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
 
     const units =  await getModelByParameterMany(Unit, "id_company", company);
 
@@ -122,6 +163,15 @@ export const updateUnit = async(req,res)=>{
 //Parametros: id
 export const deleteUnit = async(req,res)=>{
     const { company, id } = req.params;
+    const token = req.headers.authorization;   
+    if(!token) return res.status(401).json({message:"Token is required"}) 
+    const dataToken = decodeAccessToken(token);
+
+    const rolCanGet = await hasPermissRol(dataToken, deleteOperation, module)
+    const userCanGet = await hasPermissUser(dataToken, deleteOperation, module)
+
+    if(!rolCanGet && userCanGet ){ return res.status(403).json({ message: 'User not has necessary permissions ' }); }
+    
     const units = await getModelByParameterMany(Unit, "id_company", company)
     let unitFound = false;
     for (const campusObj of units.model) {
